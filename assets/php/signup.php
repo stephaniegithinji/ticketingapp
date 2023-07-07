@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'utils.php';
 
 include ("connect/config.php");
 

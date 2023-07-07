@@ -7,12 +7,12 @@ const signUpForm = document.getElementById('signupForm');
 
 const setError = (element, message) => {
   const inputField = element.parentElement;
-  
-  inputField.classList.add('error');
-  inputField.classList.remove('success');
   const errorDisplay = inputField.querySelector('.error');
 
+  inputField.classList.add('error');
+  inputField.classList.remove('success');
   errorDisplay.innerText = message;
+
 };
 
 const setSuccess = element => {
@@ -24,9 +24,19 @@ const setSuccess = element => {
   inputField.classList.remove('error');
 };
 
-const isValidEmail = email => {
+const isEmailValid = element => {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
+  return re.test(String(element).toLowerCase());
+};
+
+const isContactValid = element => {
+  const re = /^(\+254|0)?[071]\d{8}$/;
+  return re.test(String(element));
+};
+
+const isPasswordValid = element => {
+  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+  return re.test(String(element));
 };
 
 const validateInputs = () => {
@@ -47,7 +57,7 @@ const validateInputs = () => {
   if (emailValue === '') {
     setError(email, 'Email is required');
     isValid = false;
-  } else if (!isValidEmail(emailValue)) {
+  } else if (!isEmailValid(emailValue)) {
     setError(email, 'Provide a valid email address.');
     isValid = false;
   } else {
@@ -57,8 +67,8 @@ const validateInputs = () => {
   if (contactValue === '') {
     setError(contact, 'Contact is required');
     isValid = false;
-  } else if (contactValue.length !== 10) {
-    setError(contact, 'Contact must be exactly 10 characters.');
+  } else if (!isContactValid(contactValue)) {
+    setError(contact, 'contact number must begin with +254 or 0 then followed by 1 or 7, and 7 digits');
     isValid = false;
   } else {
     setSuccess(contact);
@@ -67,8 +77,8 @@ const validateInputs = () => {
   if (passwordValue === '') {
     setError(password, 'Password is required');
     isValid = false;
-  } else if (passwordValue.length < 6) {
-    setError(password, 'Password must be at least 6 characters.');
+  } else if (!isPasswordValid(passwordValue)) {
+    setError(password, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
     isValid = false;
   } else {
     setSuccess(password);

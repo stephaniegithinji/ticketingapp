@@ -2,7 +2,7 @@ const signinForm = document.getElementById('signinForm');
 const signinEmail = document.querySelector('[name="signinemail"]');
 const signinPassword = document.querySelector('[name="signinpassword"]');
 
-const setError = (element, message) => {
+const setError2 = (element, message) => {
   const inputField = element.parentElement;
   const errorDisplay = inputField.querySelector('.error');
 
@@ -11,7 +11,7 @@ const setError = (element, message) => {
   inputField.classList.remove('success');
 };
 
-const setSuccess = element => {
+const setSuccess2 = element => {
   const inputField = element.parentElement;
   const errorDisplay = inputField.querySelector('.error');
 
@@ -20,36 +20,47 @@ const setSuccess = element => {
   inputField.classList.remove('error');
 };
 
-const isValidEmail = email => {
+const isValidEmail2 = email => {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
 
-const validateInputs = () => {
+const isPasswordValid2 = element => {
+  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+  return re.test(String(element));
+};
+
+const validateInputs2 = () => {
   const sEmailValue = signinEmail.value.trim();
   const sPasswordValue = signinPassword.value.trim();
+  let isValid = true;
 
   if (sEmailValue === '') {
-    setError(signinEmail, 'Email is required');
-  } else if (!isValidEmail(sEmailValue)) {
-    setError(signinEmail, 'Provide a valid email address.');
+    setError2(signinEmail, 'Email is required');
+    isValid = false;
+  } else if (!isValidEmail2(sEmailValue)) {
+    setError2(signinEmail, 'Provide a valid email address.');
+    isValid = false;
   } else {
-    setSuccess(signinEmail);
+    setSuccess2(signinEmail);
   }
 
   if (sPasswordValue === '') {
-    setError(signinPassword, 'Password is required');
-  } else if (sPasswordValue.length < 6) {
-    setError(signinPassword, 'Password must be at least 6 characters.');
+    setError2(signinPassword, 'Password is required');
+    isValid = false;
+  } else if (!isPasswordValid2(sPasswordValue)) {
+    setError2(signinPassword, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
+    isValid = false;
   } else {
-    setSuccess(signinPassword);
+    setSuccess2(signinPassword);
   }
+
+  return isValid;
 };
 
-
 signinForm.addEventListener('submit', e => {
-    e.preventDefault();
-    if (validateInputs()) {
-        signinForm.submit();
-    }
+  e.preventDefault();
+  if (validateInputs2()) {
+    signinForm.submit();
+  }
 });

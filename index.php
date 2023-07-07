@@ -2,7 +2,7 @@
 session_start();
 
 include_once ("./connect/database.php");
-require ("signup.php");
+
 
 ?>
 <!DOCTYPE Html>
@@ -12,10 +12,10 @@ require ("signup.php");
     <meta name="viewport" content="width=device=width, initial-scale=1.0">
     <title>TickeTok</title>
     <link href="https://fonts.googleapis.com/css?family=Bad+Script|Comfortaa|Amiri|Cormorant+Garamond|Rancho|Fredericka+the+Great|Handlee|Homemade+Apple|Philosopher|Playfair+Display+SC|Reenie+Beanie|Unna|Zilla+Slab" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/aboutus.css">
-    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/modals.css">
+    <link rel="stylesheet" href="assets/css/aboutus.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
     
 </head>
 <body>
@@ -46,8 +46,6 @@ require ("signup.php");
         <div class="input-group">
             <div class="input-field">
                 <input type="text" name="username" placeholder="Username">
-                <br>
-                <br>
                 <div class="error"></div>
             </div>
             <div class="input-field">
@@ -55,7 +53,7 @@ require ("signup.php");
                 <div class="error"></div>
             </div>
             <div class="input-field">
-                <input type="number" name="contact" placeholder="Contact">
+                <input type="text" name="contact" placeholder="Contact">
                 <div class="error"></div>
             </div>
             <div class="input-field">
@@ -93,7 +91,7 @@ require ("signup.php");
         </div>
         <div class="btn-field">
         <button type="button" style="background-color: #999999" id="signinClose">Close</button>
-        <button type="submit" name= "signin" >Login &rarr;</button>
+        <button type="submit" name="signin">Login &rarr;</button>
     </div>
     </form>
 </div>
@@ -177,9 +175,9 @@ require ("signup.php");
     </div>
 </footer>
 
-    <script src="js/modals.js"></script>
-    <script src="js/signup.js"></script>
-    <script src="js/signin.js"></script>
+    <script src="assets/js/modals.js"></script>
+    <script src="assets/js/signup.js"></script>
+    <script src="assets/js/signin.js"></script>
 
 
 
