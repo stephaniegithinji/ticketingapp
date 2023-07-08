@@ -5,34 +5,34 @@
     box-sizing: border-box;
 }
 
+
 .modal {
     display: none;
     position: fixed;
     z-index: 1;
     left: 0;
     top: 0;
-    overflow: auto;
-    height: 100%;
-    width: 100%;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    padding: 30px;
     background-color: rgba(0, 0, 0, 0.75);
-}
+  }
+  
 
 .form-box {
     border-radius: 20px;
-    width: 90%;
+    width: 100%;
     max-width: 450px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: 0 auto;
     background: #fff;
-    padding: 50px 60px 70px;
+    padding: 30px 60px 20px;
     text-align: center;
 }
 
 .form-box h1 {
     font-size: 30px;
-    margin-bottom: 60px;
+    margin-bottom: 50px;
     color: #000;
     position: relative;
 }
@@ -110,6 +110,6 @@ margin-top: 20px;
 }
 
 .input-group {
-    height: 280px;
+    height: 250px;
 }
 
