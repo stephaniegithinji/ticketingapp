@@ -1,21 +1,23 @@
-const username = document.querySelector('[name="username"]');
-const email = document.querySelector('[name="email"]');
-const contact = document.querySelector('[name="contact"]');
-const password = document.querySelector('[name="password"]');
-const confirm_password = document.querySelector('[name="confirm_password"]');
-const signUpForm = document.getElementById('signupForm');
 
-const setError = (element, message) => {
+const nameEl = document.querySelector('[name="username"]');
+const emailEl = document.querySelector('[name="email"]');
+const contactEl = document.querySelector('[name="contact"]');
+const passwordEl = document.querySelector('[name="password"]');
+const confirmPasswordEl = document.querySelector('[name="confirm_password"]');
+const signUpBtn = document.querySelector('[name="signup-btn"]');
+
+const isRequiredOnSignUp = value => Boolean(value);
+
+const showErrorOnSignUp = (element, message) => {
   const inputField = element.parentElement;
   const errorDisplay = inputField.querySelector('.error');
 
   inputField.classList.add('error');
   inputField.classList.remove('success');
   errorDisplay.innerText = message;
-
 };
 
-const setSuccess = element => {
+const showSuccessOnSignUp = element => {
   const inputField = element.parentElement;
   const errorDisplay = inputField.querySelector('.error');
 
@@ -24,83 +26,64 @@ const setSuccess = element => {
   inputField.classList.remove('error');
 };
 
-const isEmailValid = element => {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(element).toLowerCase());
+const isValid = (input, pattern, message) => {
+  const value = input.value.trim();
+  if (!isRequiredOnSignUp(value)) {
+    showErrorOnSignUp(input, `${input.name} cannot be blank.`);
+    return false;
+  } else if (!pattern.test(value)) {
+    showErrorOnSignUp(input, message);
+    return false;
+  } else {
+    showSuccessOnSignUp(input);
+    return true;
+  }
 };
 
-const isContactValid = element => {
-  const re = /^(\+254|0)?[071]\d{8}$/;
-  return re.test(String(element));
+const checkName = () => isValid(nameEl, /^[a-zA-Z\s]+$/, 'Username should only contain letters and be between 4 and 22 characters in length.');
+const checkEmail = () => isValid(emailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
+const checkPassword = () => isValid(passwordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
+
+const checkPasswordMatch = () => {
+  const password = passwordEl.value.trim();
+  const confirmPassword = confirmPasswordEl.value.trim();
+  if (!isRequiredOnSignUp(confirmPassword)) {
+    showErrorOnSignUp(confirmPasswordEl, 'Confirm password cannot be blank.');
+    return false;
+  } else if (password !== confirmPassword) {
+    showErrorOnSignUp(confirmPasswordEl, 'Passwords do not match.');
+    return false;
+  } else {
+    showSuccessOnSignUp(confirmPasswordEl);
+    return true;
+  }
 };
 
-const isPasswordValid = element => {
-  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-  return re.test(String(element));
-};
 
-const validateInputs = () => {
-  const usernameValue = username.value.trim();
-  const emailValue = email.value.trim();
-  const contactValue = contact.value.trim();
-  const passwordValue = password.value.trim();
-  const confirm_passwordValue = confirm_password.value.trim();
-  let isValid = true;
+signUpBtn.addEventListener('click', e => {
+  // e.preventDefault();
 
-  if (usernameValue === '') {
-    setError(username, 'Username is required.');
-    isValid = false;
-  } else {
-    setSuccess(username);
+  let isValidForm = true;
+
+  if (!checkName()) {
+    isValidForm = false;
   }
 
-  if (emailValue === '') {
-    setError(email, 'Email is required');
-    isValid = false;
-  } else if (!isEmailValid(emailValue)) {
-    setError(email, 'Provide a valid email address.');
-    isValid = false;
-  } else {
-    setSuccess(email);
+  if (!checkEmail()) {
+    isValidForm = false;
   }
 
-  if (contactValue === '') {
-    setError(contact, 'Contact is required');
-    isValid = false;
-  } else if (!isContactValid(contactValue)) {
-    setError(contact, 'contact number must begin with +254 or 0 then followed by 1 or 7, and 7 digits');
-    isValid = false;
-  } else {
-    setSuccess(contact);
+  if (!checkPassword()) {
+    isValidForm = false;
   }
 
-  if (passwordValue === '') {
-    setError(password, 'Password is required');
-    isValid = false;
-  } else if (!isPasswordValid(passwordValue)) {
-    setError(password, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
-    isValid = false;
-  } else {
-    setSuccess(password);
+  if (!checkPasswordMatch()) {
+    isValidForm = false;
   }
 
-  if (confirm_passwordValue === '') {
-    setError(confirm_password, 'Please confirm your password.');
-    isValid = false;
-  } else if (confirm_passwordValue !== passwordValue) {
-    setError(confirm_password, "Passwords don't match!");
-    isValid = false;
+  if (isValidForm) {
   } else {
-    setSuccess(confirm_password);
-  }
-
-  return isValid;
-};
-
-signUpForm.addEventListener('submit', e => {
-  e.preventDefault();
-  if (validateInputs()) {
-    // All inputs are valid, proceed with form submission
-    signUpForm.submit();
+    // Prevent form submission
+    e.preventDefault();
   }
 });

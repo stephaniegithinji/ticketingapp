@@ -77,18 +77,17 @@ border-color: red;
 
 .input-field .error {
 color: red;
-font-size: 9px;
+font-size: 12px;
 font-family: Comfortaa, sans-serif;
 }
   
 .input-field.error .error {
 position: absolute;
-bottom: -16px;
+bottom: -20px;
 left: 0;
 width: 100%;
 text-align: left;
-margin-top: 20px;
-
+margin-top: 30px;
 }
 
 .btn-field {

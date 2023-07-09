@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Class Db
+ *
+ * This class provides a simple way to connect
+ * to a MySQL db thatperform common database queries.
+ * It includes constants for the db username, and password.
+ *
+ * @author Stephozz
+ *
+ */
+
 class Db
 {
     private $dsn;
@@ -14,7 +25,7 @@ class Db
         // https://www.phptutorial.net/php-pdo
         $this->dsn = "mysql:host=localhost;dbname=ticketingapp";
         $this->dbuser = "root";
-        $this->dbpass = '';
+        $this->dbpass = 'tiger';
         try {
             $this->conn = new PDO($this->dsn, $this->dbuser, $this->dbpass);
         } catch (PDOException $e) {
@@ -22,26 +33,5 @@ class Db
         }
     }
 }
-/* 
-<?php
-$dbhost = "localhost";
-$dbuser = "root";
-$dbpassword = "";
-$dbname = "ticketingapp";
 
-
-$dbhost = "localhost";
-$dbuser = "root";
-$dbpassword = "";
-$dbname = "ticketingapp";
-
-try {
-    $conn = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpassword);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
 ?>
-
-
-*/
