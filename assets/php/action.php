@@ -6,27 +6,71 @@ require_once 'client_functions.php';
 // Create a Client instance
 $action = new Client();
 
-if (isset($_POST["signup-btn"])) {
 
-    $username = isset($_POST["username"]) && !empty($_POST["username"]) ? Utils::sanitizeInput(ucfirst($_POST["username"])) : Utils::redirect_with_message('../../index.php', 'error', 'Username cannot be blank!');
-    $email = isset($_POST["email"]) && !empty($_POST["email"]) ? strtolower(Utils::sanitizeInput($_POST["email"])) : Utils::redirect_with_message('../../index.php', 'error', 'Email cannot be blank!');
-    $phone = isset($_POST["contact"]) && !empty($_POST["contact"]) ? Utils::sanitizeInput($_POST["contact"]) : Utils::redirect_with_message('../../index.php', 'error', 'Contact number cannot be blank!');
-    $pass = isset($_POST["password"]) && !empty($_POST["password"]) ? Utils::sanitizeInput($_POST["password"]) : Utils::redirect_with_message('../../index.php', 'error', 'Password cannot be blank!');
-    $hpass = password_hash($pass, PASSWORD_DEFAULT);
 
-    $userExists = $action->user_exists($email);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if ($userExists && $userExists['email'] === $email) {
+    $requestBody = json_decode(file_get_contents('php://input'), true);
 
-        Utils::redirect_with_message('../../index.php', 'error', 'A user with this email is already registered');
-        return;
+    switch ($requestBody['formType']) {
+        case 'signup':
+            $fields = [
+                'email' => 'Email',
+                'username' => 'Username',
+                'password' => 'Password',
+                'contact' => 'Contact'
+            ];
+
+            // Defined an array to hold the error messages
+            $errorMessages = [];
+
+            // Check if any required field(s) is empty
+            foreach ($fields as $fieldKey => $fieldName) {
+                $fieldValue = isset($requestBody[$fieldKey]) ? Utils::sanitizeInput($requestBody[$fieldKey]) : '';
+                if (empty($fieldValue)) {
+                    $errorMessages[] = $fieldName . ' cannot be blank!';
+                }
+            }
+
+            if (!empty($errorMessages)) {
+                // construct error messages then pass it along to the response
+                $errorMessage = '';
+
+                foreach ($errorMessages as $message) {
+                    $errorMessage .= Utils::showMessage('error', $message);
+                }
+
+                $response = [
+                    'success' => false,
+                    'message' => $errorMessage
+                ];
+            } else {
+                $email = isset($requestBody['email']) ? Utils::sanitizeInput($requestBody['email']) : '';
+
+                $userExists = $action->user_exists($email);
+
+                if ($userExists && $userExists['email'] === $email) {
+                    $response = [
+                        'success' => false,
+                        'message' => 'A user with this email is already registered'
+                    ];
+                } else {
+                    // Process signup logic
+                    //
+
+                }
+            }
+            break;
+        case 'signin':
+            break;
+        default:
+            break;
     }
 }
 
 
-if (isset($_POST["login-btn"])) {
+if (isset($_POST["signin-btn"])) {
 }
-
 
 if (isset($_POST["contact-btn"])) {
     try {
@@ -37,7 +81,7 @@ if (isset($_POST["contact-btn"])) {
         $mailBody = "You have a new inquiry from" . $email . "<br><br>" . $message;
 
         if (Mailer::sendMail("adm1n.tickectok@gmail.com", $sub, $mailBody)) {
-            Utils::redirect_with_message('../../index.php', 'success', 'Message sent! Thanks for contacting us.');
+            Utils::redirect_with_message('../../index.php','success', 'Message sent! Thanks for contacting us.');
             return;
         } else {
             Utils::redirect_with_message('../../index.php', 'error', 'Email not sent. An error was encountered.');

@@ -1,10 +1,11 @@
-
+const signupForm = document.getElementById("signupForm");
+const formTypeEl = document.querySelector('[name="formType"]');
 const nameEl = document.querySelector('[name="username"]');
 const emailEl = document.querySelector('[name="email"]');
 const contactEl = document.querySelector('[name="contact"]');
 const passwordEl = document.querySelector('[name="password"]');
 const confirmPasswordEl = document.querySelector('[name="confirm_password"]');
-const signUpBtn = document.querySelector('[name="signup-btn"]');
+const msg = document.querySelector('small');
 
 const isRequiredOnSignUp = value => Boolean(value);
 
@@ -26,7 +27,7 @@ const showSuccessOnSignUp = element => {
   inputField.classList.remove('error');
 };
 
-const isValid = (input, pattern, message) => {
+const isValidOnSignUp = (input, pattern, message) => {
   const value = input.value.trim();
   if (!isRequiredOnSignUp(value)) {
     showErrorOnSignUp(input, `${input.name} cannot be blank.`);
@@ -40,9 +41,10 @@ const isValid = (input, pattern, message) => {
   }
 };
 
-const checkName = () => isValid(nameEl, /^[a-zA-Z\s]+$/, 'Username should only contain letters and be between 4 and 22 characters in length.');
-const checkEmail = () => isValid(emailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
-const checkPassword = () => isValid(passwordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
+const checkName = () => isValidOnSignUp(nameEl, /^[a-zA-Z\s]+$/, 'Username should only contain letters and be between 4 and 22 characters in length.');
+const checkEmail = () => isValidOnSignUp(emailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
+const checkContact = () => isValidOnSignUp(contactEl, /^(\+254|0)?[071]\d{8}$/, "Contact number must begin with +254 or 0 then followed by 1 or 7, and other 7 digits");
+const checkPassword = () => isValidOnSignUp(passwordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
 
 const checkPasswordMatch = () => {
   const password = passwordEl.value.trim();
@@ -59,31 +61,82 @@ const checkPasswordMatch = () => {
   }
 };
 
+const displayErrorMessage = (message) => {
+  msg.innerHTML = `
+    <div class="alert error">
+      <p class="text">
+        <strong>${message}</strong>
+      </p>
+    </div>`;
+};
 
-signUpBtn.addEventListener('click', e => {
-  // e.preventDefault();
 
-  let isValidForm = true;
+const clearMessages = () => {
+  msg.innerHTML = '';
+};
+
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault(); // Prevent form submission
+
+  clearMessages(); // Clear previous messages
+
+  let isFormValidOnSignUp = true;
 
   if (!checkName()) {
-    isValidForm = false;
+    isFormValidOnSignUp = false;
   }
 
   if (!checkEmail()) {
-    isValidForm = false;
+    isFormValidOnSignUp = false;
+  }
+
+  if (!checkContact()) {
+    isFormValidOnSignUp = false;
   }
 
   if (!checkPassword()) {
-    isValidForm = false;
+    isFormValidOnSignUp = false;
   }
 
   if (!checkPasswordMatch()) {
-    isValidForm = false;
+    isFormValidOnSignUp = false;
   }
 
-  if (isValidForm) {
-  } else {
-    // Prevent form submission
-    e.preventDefault();
+  if (isFormValidOnSignUp) {
+    const formType = formTypeEl.value;
+    const username = nameEl.value;
+    const email = emailEl.value;
+    const contact = contactEl.value;
+    const password = passwordEl.value;
+
+    // Construct request body object
+    const requestBody = {
+      formType,
+      username,
+      email,
+      contact,
+      password
+    };
+
+    try {
+      const response = await fetch('process.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+
+          displayErrorMessage(responseData.message);
+
+      } else {
+        displayErrorMessage('An error occurred during the network call.');
+      }
+    } catch (error) {
+      displayErrorMessage('An error occurred during the network call.');
+    }
   }
 });
