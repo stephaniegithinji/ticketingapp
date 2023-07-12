@@ -1,8 +1,12 @@
-const signinForm = document.getElementById('signinForm');
-const signinEmail = document.querySelector('[name="signinemail"]');
-const signinPassword = document.querySelector('[name="signinpassword"]');
+const signinForm = document.getElementById("signinForm");
+const signinformTypeEl = document.querySelector('[name="formType"]');
+const signinEmailEl = document.querySelector('[name="signin-email"]');
+const signinPasswordEl = document.querySelector('[name="signin-password"]');
+const msg_signin = document.querySelector('small');
 
-const setError2 = (element, message) => {
+const isRequiredOnSignIn = value => Boolean(value);
+
+const showErrorOnSignIn = (element, message) => {
   const inputField = element.parentElement;
   const errorDisplay = inputField.querySelector('.error');
 
@@ -11,7 +15,7 @@ const setError2 = (element, message) => {
   inputField.classList.remove('success');
 };
 
-const setSuccess2 = element => {
+const showSuccessOnSignIn = element => {
   const inputField = element.parentElement;
   const errorDisplay = inputField.querySelector('.error');
 
@@ -20,47 +24,81 @@ const setSuccess2 = element => {
   inputField.classList.remove('error');
 };
 
-const isValidEmail2 = email => {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
-};
-
-const isPasswordValid2 = element => {
-  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-  return re.test(String(element));
-};
-
-const validateInputs2 = () => {
-  const sEmailValue = signinEmail.value.trim();
-  const sPasswordValue = signinPassword.value.trim();
-  let isValid = true;
-
-  if (sEmailValue === '') {
-    setError2(signinEmail, 'Email is required');
-    isValid = false;
-  } else if (!isValidEmail2(sEmailValue)) {
-    setError2(signinEmail, 'Provide a valid email address.');
-    isValid = false;
+const isValidOnSignIn = (input, pattern, message) => {
+  const value = input.value.trim();
+  if (!isRequiredOnSignIn(value)) {
+    showErrorOnSignIn(input, `${input.name} cannot be blank.`);
+    return false;
+  } else if (!pattern.test(value)) {
+    showErrorOnSignIn(input, message);
+    return false;
   } else {
-    setSuccess2(signinEmail);
+    showSuccessOnSignIn(input);
+    return true;
+  }
+};
+
+const checkEmailOnSignIn = () => isValidOnSignIn(signinEmailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
+const checkPasswordOnSignIn = () => isValidOnSignIn(signinPasswordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
+
+const displayErrorMessageOnSignIn = (message) => {
+  msg_signin.innerHTML = `
+    <div class="alert error">
+      <p class="text">
+        <strong>${message}</strong>
+      </p>
+    </div>`;
+};
+
+
+const clearMessagesOnSignIn = () => {
+  msg_signin.innerHTML = '';
+};
+
+// Check each input field for errors and
+// prevent form submission if any fields has errors
+signinForm.addEventListener('submit', async (e) => {
+  e.preventDefault(); // Prevent form submission
+
+  clearMessagesOnSignIn(); // Clear previous messages
+
+  let isFormValidOnSignIn = true;
+
+  if (!checkEmailOnSignIn()) {
+    isFormValidOnSignIn = false;
   }
 
-  if (sPasswordValue === '') {
-    setError2(signinPassword, 'Password is required');
-    isValid = false;
-  } else if (!isPasswordValid2(sPasswordValue)) {
-    setError2(signinPassword, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
-    isValid = false;
-  } else {
-    setSuccess2(signinPassword);
+  if (!checkPasswordOnSignIn()) {
+    isFormValidOnSignIn = false;
   }
 
-  return isValid;
-};
+  if (isFormValidOnSignIn) {
+    const formType = signinformTypeEl.value;
+    const emailSignIn = signinEmailEl.value;
+    const passwordSignIn = signinPasswordEl.value;
 
-signinForm.addEventListener('submit', e => {
-  e.preventDefault();
-  if (validateInputs2()) {
-    signinForm.submit();
+    // Construct request body object
+    const requestBodyOnSignIn = {
+      formType,
+      emailSignIn,
+      passwordSignIn
+    };
+
+    try {
+      const responseOnSignIn = await fetch('assets/php/action.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBodyOnSignIn)
+      });
+
+      if (responseOnSignIn.ok) {
+        const responseOnSignInData = await responseOnSignIn.json();
+        displayErrorMessageOnSignIn(responseOnSignInData.message);
+      }
+    } catch (error) {
+      displayErrorMessageOnSignIn('An error occurred during the network call.');
+    }
   }
 });

@@ -30,11 +30,11 @@ signinClose.onclick = function() {
 
 //Contact Us
 var contactModal = document.getElementById("contactus");
-var contactUsBtn = document.getElementById("contactUsBtn");
+var contact = document.getElementById("contactUsBtn");
 var contactClose = document.getElementById("contactClose");
 
 //Function to open modal
-contactUsBtn.onclick = function() {
+contact.onclick = function() {
    contactModal.style.display = "block";
 };
 

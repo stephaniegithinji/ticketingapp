@@ -5,7 +5,7 @@ const emailEl = document.querySelector('[name="email"]');
 const contactEl = document.querySelector('[name="contact"]');
 const passwordEl = document.querySelector('[name="password"]');
 const confirmPasswordEl = document.querySelector('[name="confirm_password"]');
-const msg = document.querySelector('small');
+const msg_signup = document.querySelector('small');
 
 const isRequiredOnSignUp = value => Boolean(value);
 
@@ -61,8 +61,8 @@ const checkPasswordMatch = () => {
   }
 };
 
-const displayErrorMessage = (message) => {
-  msg.innerHTML = `
+const displayErrorMessageOnSignup = (message) => {
+  msg_signup.innerHTML = `
     <div class="alert error">
       <p class="text">
         <strong>${message}</strong>
@@ -70,15 +70,23 @@ const displayErrorMessage = (message) => {
     </div>`;
 };
 
+displaySuccessMessageOnSignup = (message) => {
+  msg_signup.innerHTML = `
+    <div class="alert success">
+      <p class="text">
+        <strong>${message}</strong>
+      </p>
+    </div>`;
+};
 
-const clearMessages = () => {
-  msg.innerHTML = '';
+const clearMessagesOnSignup = () => {
+  msg_signup.innerHTML = '';
 };
 
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // Prevent form submission
 
-  clearMessages(); // Clear previous messages
+  clearMessagesOnSignup(); // Clear previous messages
 
   let isFormValidOnSignUp = true;
 
@@ -110,7 +118,7 @@ signupForm.addEventListener('submit', async (e) => {
     const password = passwordEl.value;
 
     // Construct request body object
-    const requestBody = {
+    const requestBodyOnSignUp = {
       formType,
       username,
       email,
@@ -119,24 +127,24 @@ signupForm.addEventListener('submit', async (e) => {
     };
 
     try {
-      const response = await fetch('process.php', {
+      const responseOnSignUp = await fetch('assets/php/action.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBodyOnSignUp)
       });
 
-      if (response.ok) {
-        const responseData = await response.json();
-
-          displayErrorMessage(responseData.message);
-
-      } else {
-        displayErrorMessage('An error occurred during the network call.');
+      if (responseOnSignUp.ok) {
+        const responseOnSignUpData = await responseOnSignUp.json();
+        if (responseOnSignUpData.success) {
+          displaySuccessMessageOnSignup(responseOnSignUpData.message);
+        } else {
+          displayErrorMessageOnSignup(responseOnSignUpData.message);
+        }
       }
     } catch (error) {
-      displayErrorMessage('An error occurred during the network call.');
+      displayErrorMessageOnSignup('Some error occurred try again.');
     }
   }
 });
