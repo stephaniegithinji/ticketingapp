@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device=width, initial-scale=1.0">
     <title>TickeTok </title>
     <link href="https://fonts.googleapis.com/css?family=Bad+Script|Comfortaa|Amiri|Cormorant+Garamond|Rancho|Fredericka+the+Great|Handlee|Homemade+Apple|Philosopher|Playfair+Display+SC|Reenie+Beanie|Unna|Zilla+Slab" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/modals.css">
-    <link rel="stylesheet" href="../css/cards.css">
-    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/modals.css">
+    <link rel="stylesheet" href="../assets/css/cards.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
 
@@ -16,9 +16,9 @@
     <div class="navbar">
         <h1 class="logo" style="font-size: 40px;">TickeTok </h1>
         <ul style="font-size: 15px;">
-            <li><a href="../interfaces/events.php">Home</a></li>
-            <li><a href="../interfaces/history.php">My History</a></li>
-            <li><a href="../../logout.php">Logout</a></li>
+            <li><a href="../assets/interfaces/events.php">Home</a></li>
+            <li><a href="../assets/interfaces/history.php">My History</a></li>
+            <li><a href="../assets/../assets/logout.php">Logout</a></li>
             <li><input type="text" id="search" name="search" placeholder="SEARCH"></li>
         </ul>
     </div>
@@ -35,7 +35,7 @@
         <div class="column-item">
             <!-- Loop this card-->
         <div class="card" style="width: 33rem;">
-                    <img class="card-img-top" src="../images/p1.jpg" alt="Event Image">
+                    <img class="card-img-top" src="../assets/images/p1.jpg" alt="Event Image">
                     <div class="card-body">
                     <h5 class="card-title">Event Name</h5>
                     <ul class="card-text">
@@ -105,8 +105,8 @@
             <div class="footer-col">
                 <h4>company</h4>
                 <ul>
-                    <li><a href="../index.php">About Us</a></li>
-                    <li><a href="../index.php">Our Services</a></li>
+                    <li><a href="../assets/index.php">About Us</a></li>
+                    <li><a href="../assets/index.php">Our Services</a></li>
                     <li><a href="#">Privacy Policy</a></li>
                 </ul>
             </div>
@@ -123,6 +123,6 @@
         </div>
     </div>
 </footer>
-<script src='../js/clientmodals.js'></script>
+<script src='../assets/js/clientmodals.js'></script>
 </body>
 </html>

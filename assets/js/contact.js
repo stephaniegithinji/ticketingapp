@@ -1,4 +1,4 @@
-const contactUsForm = document.getElementById("contactForm");
+const contactUsBtn = document.querySelector('[name="contact-btn"]');
 const emailFromEl = document.querySelector('[name="email_from"]');
 const subjectEl = document.querySelector('[name="subject"]');
 const messageEl = document.querySelector('[name="message"]');
@@ -35,26 +35,27 @@ const isValidOnContact = (input, pattern, message) => {
   }
 };
 
-const checkRecipientEmail = () => isValidOnContact(emailFromEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
-const checkSubject = () => isValidOnContact(subjectEl, /^[a-zA-Z\s]+$/, 'Subject should only contain letters.');
-const checkMessage = () => isValidOnContact(messageEl, /^[a-zA-Z\s]+$/, 'Message should only contain letters.');
+const checkEmailOnContact = () => isValidOnContact(emailFromEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
+const checkSubjectOnContact = () => isValidOnContact(subjectEl, /^[a-zA-Z\s]+$/, 'Subject should only contain letters.');
+const checkMessageOnContact = () => isValidOnContact(messageEl, /^[a-zA-Z\s]+$/, 'Message should only contain letters.');
 
-contactUsForm.addEventListener('submit', e => {
-  let isFormValid = true;
+// Check each input field for errors and
+// prevent form submission if any fields has errors
+contactUsBtn.addEventListener('click', e => {
+  let isFormValidOnContact = true;
 
-  if (!checkRecipientEmail()) {
-    isFormValid = false;
+  if (!checkEmailOnContact()) {
+    isFormValidOnContact = false;
   }
 
-  if (!checkSubject()) {
-    isFormValid = false;
+  if (!checkSubjectOnContact()) {
+    isFormValidOnContact = false;
   }
 
-  if (!checkMessage()) {
-    isFormValid = false;
+  if (!checkMessageOnContact()) {
+    isFormValidOnContact = false;
   }
-  // Check each field for errors and prevent form submission if any fields have errors
-  if (isFormValid) { } else {
+  if (isFormValidOnContact) { } else {
     // Prevent form submission
     e.preventDefault();
   }

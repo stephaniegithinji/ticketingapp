@@ -1,6 +1,6 @@
 <?php
 
-require_once  '../functions/admin.php';
+require_once  '../assets/php/admin/admin.php';
 
 $interfaces = new Admin();
 
@@ -16,11 +16,11 @@ $cards = $interfaces->fetchEvents();
     <title>TickeTok </title>
     <link href="https://fonts.googleapis.com/css?family=Bad+Script|Comfortaa|Amiri|Cormorant+Garamond|Rancho|Fredericka+the+Great|Handlee|Homemade+Apple|Philosopher|Playfair+Display+SC|Reenie+Beanie|Unna|Zilla+Slab" rel="stylesheet">
     <script src="https://kit.fontawesome.com/0d8179c479.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/modals.css">
-    <link rel="stylesheet" href="../css/cards.css">
-    <link rel="stylesheet" href="../css/admincards.css">
-    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/modals.css">
+    <link rel="stylesheet" href="../assets/css/cards.css">
+    <link rel="stylesheet" href="../assets/css/admincards.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
 
@@ -28,7 +28,7 @@ $cards = $interfaces->fetchEvents();
     <div class="navbar">
         <h1 class="logo" style="font-size: 40px;">TickeTok </h1>
         <ul style="font-size: 15px;">
-            <li><a href="../interfaces/admin.php">Home</a></li>
+            <li><a href="../assets/interfaces/admin.php">Home</a></li>
             <li><a href="#" id="addBtn">Add Event</a></li>
             <li><a href="#">Logout</a></li>
             <li><input type="text" id="search" name="search" placeholder="SEARCH"></li>
@@ -46,7 +46,7 @@ $cards = $interfaces->fetchEvents();
     <div class="card-container" style="margin-left: 130px; margin-bottom: 100px;">
         <div class="column-item">
         <div class="card" style="width: 33rem;">
-                    <img class="card-img-top" src="../images/p1.jpg" alt="Event Image">
+                    <img class="card-img-top" src="../assets/images/p1.jpg" alt="Event Image">
                     <div class="card-body">
                     <h3 class="card-title"><!--php code to fetch event name as added-->Event Name</h3>
                     <ul class="card-text">
@@ -75,7 +75,7 @@ $cards = $interfaces->fetchEvents();
 <div class="modal" id="addevent">
     <div class="form-box" style="height: 800px;">
         <h1>Add Event</h1>
-        <form method="POST" action="../controller/action.php">
+        <form method="POST" action="../assets/controller/action.php">
             <div class="input-group">
                 <div class="input-field">
                     <input type="text"  name="event_name" placeholder="Event Name" value="<?= $card['event_name'] ?>">
@@ -116,7 +116,7 @@ $cards = $interfaces->fetchEvents();
 <div class="modal" id="editEvent">
     <div class="form-box" style="height: 800px;">
         <h1>Edit Event</h1>
-        <form method="POST" action="../controller/action.php">
+        <form method="POST" action="../assets/controller/action.php">
             <div class="input-group">
                 <div class="input-field">
                     <input type="text" name="event_name" placeholder="Event Name" value="<?= $card['event_name'] ?>">
@@ -157,7 +157,7 @@ $cards = $interfaces->fetchEvents();
 <div class="modal" id="deleteEvent">
     <div class="form-box" style="height: 460px;">
         <h1>Delete Event</h1>
-        <form method="POST" action="../controller/action.php">
+        <form method="POST" action="../assets/controller/action.php">
         <h2>Are you sure you want to delete this Event?</h2>
         <br>
         <div class="btn-field">
@@ -178,8 +178,8 @@ $cards = $interfaces->fetchEvents();
             <div class="footer-col">
                 <h4>company</h4>
                 <ul>
-                    <li><a href="../index.php">About Us</a></li>
-                    <li><a href="../index.php">Our Services</a></li>
+                    <li><a href="../assets/index.php">About Us</a></li>
+                    <li><a href="../assets/index.php">Our Services</a></li>
                     <li><a href="#">Privacy Policy</a></li>
                 </ul>
             </div>
@@ -196,6 +196,6 @@ $cards = $interfaces->fetchEvents();
         </div>
     </div>
 </footer>
-<script src="../js/adminmodals.js"></script>
+<script src="../assets/js/adminmodals.js"></script>
 </body>
 </html>
