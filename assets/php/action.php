@@ -7,13 +7,14 @@ require_once 'client_functions.php';
 $action = new Client();
 
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+    // Decode the request body JSON data into an associative array
     $requestBody = json_decode(file_get_contents('php://input'), true);
 
+    // Switch statement based on the value of 'formType' in the request body
     switch ($requestBody['formType']) {
         case 'signup':
+            // Define an array to hold the required fields and their corresponding names
             $fields = [
                 'email' => 'Email',
                 'username' => 'Username',
@@ -33,40 +34,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (!empty($errorMessages)) {
-                // construct error messages then pass it along to the response
+                // Construct error messages by iterating through the array and appending them
                 $errorMessage = '';
-
                 foreach ($errorMessages as $message) {
                     $errorMessage .= Utils::showMessage('error', $message);
                 }
 
+                // Prepare the response with the error messages
                 $response = [
                     'success' => false,
                     'message' => $errorMessage
                 ];
             } else {
+                // Sanitize the email field
                 $email = isset($requestBody['email']) ? Utils::sanitizeInput($requestBody['email']) : '';
 
+                // Check if a user with the provided email already exists
                 $userExists = $action->user_exists($email);
 
                 if ($userExists && $userExists['email'] === $email) {
+                    // Construct response if a user with the email already exists
                     $response = [
                         'success' => false,
                         'message' => 'A user with this email is already registered'
                     ];
                 } else {
                     // Process signup logic
-                    //
+                    // ...
 
+                    // Example response for successful signup
+                    $response = [
+                        'success' => true,
+                        'message' => 'Signup successful'
+                    ];
                 }
             }
             break;
         case 'signin':
+            // Handle signin logic
+            // ...
             break;
         default:
+            // Handle other form types, if needed
+            // ...
             break;
     }
 }
+
 
 
 if (isset($_POST["signin-btn"])) {
