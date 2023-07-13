@@ -6,7 +6,6 @@ require_once 'client_functions.php';
 // Create a Client instance
 $action = new Client();
 
-
 // Decode the request body JSON data into an associative array
 $requestBody = json_decode(file_get_contents('php://input'), true);
 
@@ -86,13 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signup
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] === 'signin') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signin') {
     $response = null;
 
     try {
-
         $email = isset($requestBody['email']) ? Utils::sanitizeInput($requestBody['email']) : '';
-        $password = isset($requestBody['password']) ? Utils::sanitizeInput($requestBody['password']) : '';
+        $pass = isset($requestBody['password']) ? Utils::sanitizeInput($requestBody['password']) : '';
 
         $errorMessages = [];
 
@@ -100,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] === 'signi
             $errorMessages[] = 'Email cannot be blank!';
         }
 
-        if (empty($password)) {
+        if (empty($pass)) {
             $errorMessages[] = 'Password cannot be blank!';
         }
 
@@ -114,31 +112,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] === 'signi
                 'message' => $errorMessage
             ];
         }
-        // Call the [loginInAccount] method for a user
+        // Call the [loginIntoAccount] method for a user
         $result = $action->loginIntoAccount($email);
 
-        if (!empty($result)) {
-            if (password_verify($password, $result['password'])) {
-                // User provided correct password
-                $isAdmin = ($result['is_admin'] == 1);
-                $_SESSION['admin'] = $isAdmin ? $result['username'] : null;
-                $_SESSION['adminEmail'] = $isAdmin ? $result['email'] : null;
-                $_SESSION['client'] = !$isAdmin ? $result['username'] : null;
-                $_SESSION['clientEmail'] = !$isAdmin ? $result['email'] : null;
+        $isAdmin = ($result['is_admin'] == 1) ? 'true' : 'false';
 
-                Utils::redirect_to($isAdmin ? '../../interfaces/admin.php' : '../../interfaces/events.php');
-            } else {
-                // User provided incorrect password
-                $response = [
-                    'success' => false,
-                    'message' => 'Invalid email or password.'
-                ];
-            }
+        // $response = [
+        //     'success' => true,
+        //     'message' => ' Value:' . $isAdmin
+        // ];
+
+
+        if (!empty($result) && password_verify($pass, $result['password'])) {
+
+            $isAdmin = ($result['is_admin'] == 1) ? true : false;
+
+
+            // User provided correct password
+            $redirectNode = $isAdmin ? 'admin' : 'client';
+            $_SESSION['userType'] = $redirectNode;
+            $_SESSION['admin'] = $isAdmin ? $result['username'] : null;
+            $_SESSION['adminEmail'] = $isAdmin ? $email : null;
+            $_SESSION['client'] = !$isAdmin ? $result['username'] : null;
+            $_SESSION['clientEmail'] = !$isAdmin ? $email : null;
+
+            $response = [
+                'success' => true,
+                'message' => $redirectNode
+            ];
+
+            //     Utils::redirect_to($isAdmin ? '../../interfaces/admin.php' : '../../interfaces/events.php');
         } else {
-            // User not found
+            // User provided incorrect email or password
             $response = [
                 'success' => false,
-                'message' => 'User not found.'
+                'message' => 'Invalid email or password.'
             ];
         }
     } catch (Exception $e) {
@@ -148,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] === 'signi
         ];
         return;
     }
+
     echo json_encode($response);
 }
 
