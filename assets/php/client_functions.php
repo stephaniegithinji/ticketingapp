@@ -43,7 +43,7 @@ class Client extends Db
 
 	public function loginIntoAccount($email)
 	{
-		$sql = "SELECT username, password, is_admin FROM users WHERE AND email = :email";
+		$sql = "SELECT username, password, is_admin FROM users WHERE email = :email";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(['email' => $email]);
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
