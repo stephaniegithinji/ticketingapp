@@ -29,7 +29,7 @@ class Client extends Db
 	 */
 	public function createUserAccount($username, $email, $contact, $password)
 	{
-		$sql = "INSERT INTO users(username, email, contact, password)VALUES(:name, :email, :phone, :pass)";
+		$sql = "INSERT INTO users(username, email, contact, password)VALUES(:uname, :email, :phone, :pass)";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(['uname' => $username, 'email' => $email, 'phone' => $contact, 'pass' => $password]);
 		return true;
