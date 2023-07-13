@@ -8,9 +8,9 @@ class Admin extends Db
 
     public function addEvent($event_name, $date, $venue, $time, $ticket_price,  $tickets_capacity, $thumbnail)
 	{
-		$sql = "INSERT INTO events(id, event_name, date, venue, time, ticket_price, tickets_available, banner, created_at, updated_at) VALUES(:id, :event_name, :date, :venue, :time, :ticket_price, :tickets_available, :banner, NOW(), '0000-00-00 00:00:00')";
+		$sql = "INSERT INTO events(event_name, date, venue, time, ticket_price, tickets_capacity, banner, created_at, updated_at) VALUES(:event_name, :date, :venue, :time, :ticket_price, :tickets_capacity, :banner, NOW(), '0000-00-00 00:00:00')";
 		$stmt = $this->conn->prepare($sql);
-		$stmt->execute(['event_name' => $event_name, 'date' => $date, 'venue' => $venue, 'time' => $time, 'ticket_price' => $ticket_price, 'tickets_available' => $tickets_capacity, 'banner' => $thumbnail]);
+		$stmt->execute(['event_name' => $event_name, 'date' => $date, 'venue' => $venue, 'time' => $time, 'ticket_price' => $ticket_price, 'tickets_capacity' => $tickets_capacity, 'banner' => $thumbnail]);
 		return true;
 	}
 
