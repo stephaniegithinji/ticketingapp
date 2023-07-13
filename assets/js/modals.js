@@ -45,9 +45,9 @@ contactClose.onclick = function() {
 
 //Function to close modal when clicked outside
 window.onclick = function(event) {
-   if (event.target === signupModal) {
-      signupModal.style.display = "none";
-   }
+   // if (event.target === signupModal) {
+   //    signupModal.style.display = "none";
+   // }
    if (event.target === signinModal) {
       signinModal.style.display = "none";
    }
