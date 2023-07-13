@@ -4,10 +4,10 @@ require_once 'utils.php';
 
 switch ($_SESSION['userType']) {
     case 'client':
-        Utils::redirect_to('http://127.0.0.1/ticketingapp/interfaces/events.php');
+        Utils::redirect_to('interfaces/events.php');
         break;
     case 'admin':
-        Utils::redirect_to('http://127.0.0.1/ticketingapp/interfaces/admin.php');
+        Utils::redirect_to('interfaces/admin.php');
         break;
     default:
         break;
@@ -95,11 +95,6 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                     <button type="submit" class="btn" name="signup-btn">Signup &rarr;</button>
                 </div>
             </form>
-            <ul class="inline-links">
-                <li class="inline-links-item">
-                    <span>Already got an account? &#160&#160&#160<a class="link" href="index.php">Sign in</a></span>
-                </li>
-            </ul>
         </div>
     </div>
 
@@ -119,19 +114,17 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                     <input type="text" id="signinpassword" name="signin-password" placeholder="Password">
                     <div class="error"></div>
                 </div>
+                <ul class="inline-links">
+                    <li class="inline-links-item">
+                        <a href="#"><span class="text">Forgotten Password?</span></a>
+                    </li>
+                </ul>
                 <div class="btn-field">
                     <button type="button" class="close" id="signinClose">Close</button>
                     <button type="submit" class="btn" name="signin-btn">Login &rarr;</button>
                 </div>
             </form>
-            <ul class="inline-links">
-                <li class="inline-links-item">
-                    <a href="#"><span class="text">Forgotten Password?</span></a>
-                </li>
-                <li class="inline-links-item">
-                    <a href="#"><span class="text">Sign Up</span></a>
-                </li>
-            </ul>
+
         </div>
     </div>
 
