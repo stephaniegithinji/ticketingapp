@@ -117,24 +117,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signin
 
         $isAdmin = ($result['is_admin'] == 1) ? 'true' : 'false';
 
-        // $response = [
-        //     'success' => true,
-        //     'message' => ' Value:' . $isAdmin
-        // ];
-
-
         if (!empty($result) && password_verify($pass, $result['password'])) {
 
             $isAdmin = ($result['is_admin'] == 1) ? true : false;
 
-
             // User provided correct password
             $redirectNode = $isAdmin ? 'admin' : 'client';
             $_SESSION['userType'] = $redirectNode;
-            $_SESSION['admin'] = $isAdmin ? $result['username'] : null;
-            $_SESSION['adminEmail'] = $isAdmin ? $email : null;
-            $_SESSION['client'] = !$isAdmin ? $result['username'] : null;
-            $_SESSION['clientEmail'] = !$isAdmin ? $email : null;
+            switch ($_SESSION['userType']) {
+                case 'admin':
+                    $_SESSION['admin'] =  $result['username'];
+                    $_SESSION['adminEmail'] = $email;
+                    break;
+                case 'client':
+                    $_SESSION['client'] = $result['username'];
+                    $_SESSION['clientEmail'] = $email;
+                    break;
+                default:
+                    break;
+            }
 
             $response = [
                 'success' => true,
