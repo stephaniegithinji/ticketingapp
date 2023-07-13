@@ -9,16 +9,18 @@ const msgSignup = document.querySelector('#signup small');
 
 const isRequiredOnSignUp = value => Boolean(value);
 
+
+
 const isValidOnSignUp = (input, pattern, message) => {
   const value = input.value.trim();
-  if (!isRequiredOnSignIn(value)) {
-    showErrorOnSignIn(input, `${input.name} cannot be blank.`);
+  if (!isRequiredOnSignUp(value)) {
+    showErrorOnSignUp(input, `${input.name} cannot be blank.`);
     return false;
   } else if (!pattern.test(value)) {
-    showErrorOnSignIn(input, message);
+    showErrorOnSignUp(input, message);
     return false;
   } else {
-    showSuccessOnSignIn(input);
+    showSuccessOnSignUp(input);
     return true;
   }
 };

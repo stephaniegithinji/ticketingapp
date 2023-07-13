@@ -11,12 +11,6 @@ addBtn.onclick = function() {
 addEventClose.onclick = function() {
     addEventModal.style.display = "none";
 }
-//Function to close modal when clicked outside
-window.onclick = function(event) {
-    if (event.target === addEventModal) {
-        addEventModal.style.display = "none";
-    }
-}
 
 //Deleting Events Alert
 var deleteModal = document.getElementById("deleteEvent");
@@ -31,12 +25,7 @@ deleteBtn.onclick = function() {
 deleteClose.onclick = function() {
    deleteModal.style.display = "none";
 }
-//Function to close modal when clicked outside
-window.onclick = function(event) {
-   if (event.target === ByteLengthQueuingStrategyModal) {
-      deleteModal.style.display = "none";
-   }
-}
+
 
 //Editing Events Modal
 var editModal = document.getElementById("editEvent");

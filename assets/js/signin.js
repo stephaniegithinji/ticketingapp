@@ -101,12 +101,11 @@ const signinForm = document.getElementById("signinForm");
                         const responseData = await response.json();
                         if (responseData.success) {
                             switch (responseData.message) {
-                                case 'client':
-                                    // window.location.href('interfaces/events.php');
-                                    window.location.href = 'http://127.0.0.1/ticketingapp/interfaces/events.php';
-                                    break;
                                 case 'admin':
                                     window.location.href = 'http://127.0.0.1/ticketingapp/interfaces/admin.php';
+                                    break;
+                                case 'client':
+                                    window.location.href = 'http://127.0.0.1/ticketingapp/interfaces/events.php';
                                     break;
                                 default:
                                     displayErrorMessageOnSignin(`case ${responseData.message} not implemented yet`);
