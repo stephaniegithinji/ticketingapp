@@ -1,13 +1,27 @@
 const signupForm = document.getElementById("signupForm");
-const formTypeEl = document.querySelector('[name="formType"]');
+const signupFormTypeEl = document.querySelector('[name="formType-signup"]');
 const nameEl = document.querySelector('[name="username"]');
 const emailEl = document.querySelector('[name="email"]');
 const contactEl = document.querySelector('[name="contact"]');
 const passwordEl = document.querySelector('[name="password"]');
 const confirmPasswordEl = document.querySelector('[name="confirm_password"]');
-const msg_signup = document.querySelector('small');
+const msgSignup = document.querySelector('#signup small');
 
 const isRequiredOnSignUp = value => Boolean(value);
+
+const isValidOnSignUp = (input, pattern, message) => {
+  const value = input.value.trim();
+  if (!isRequiredOnSignIn(value)) {
+    showErrorOnSignIn(input, `${input.name} cannot be blank.`);
+    return false;
+  } else if (!pattern.test(value)) {
+    showErrorOnSignIn(input, message);
+    return false;
+  } else {
+    showSuccessOnSignIn(input);
+    return true;
+  }
+};
 
 const showErrorOnSignUp = (element, message) => {
   const inputField = element.parentElement;
@@ -27,98 +41,71 @@ const showSuccessOnSignUp = element => {
   inputField.classList.remove('error');
 };
 
-const isValidOnSignUp = (input, pattern, message) => {
-  const value = input.value.trim();
-  if (!isRequiredOnSignUp(value)) {
-    showErrorOnSignUp(input, `${input.name} cannot be blank.`);
-    return false;
-  } else if (!pattern.test(value)) {
-    showErrorOnSignUp(input, message);
-    return false;
-  } else {
-    showSuccessOnSignUp(input);
-    return true;
-  }
-};
-
-const checkName = () => isValidOnSignUp(nameEl, /^[a-zA-Z\s]+$/, 'Username should only contain letters and be between 4 and 22 characters in length.');
-const checkEmail = () => isValidOnSignUp(emailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
-const checkContact = () => isValidOnSignUp(contactEl, /^(\+254|0)?[071]\d{8}$/, "Contact number must begin with +254 or 0 then followed by 1 or 7, and other 7 digits");
-const checkPassword = () => isValidOnSignUp(passwordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
-
-const checkPasswordMatch = () => {
-  const password = passwordEl.value.trim();
-  const confirmPassword = confirmPasswordEl.value.trim();
-  if (!isRequiredOnSignUp(confirmPassword)) {
-    showErrorOnSignUp(confirmPasswordEl, 'Confirm password cannot be blank.');
-    return false;
-  } else if (password !== confirmPassword) {
-    showErrorOnSignUp(confirmPasswordEl, 'Passwords do not match.');
-    return false;
-  } else {
-    showSuccessOnSignUp(confirmPasswordEl);
-    return true;
-  }
-};
-
+// Function to display an error message in the sign-up form
 const displayErrorMessageOnSignup = (message) => {
-  msg_signup.innerHTML = `
-    <div class="alert error">
-      <p class="text">
-        <strong>${message}</strong>
-      </p>
-    </div>`;
+  msgSignup.innerHTML = `
+        <div class="alert error">
+            <p class="text">
+                <strong>${message}</strong>
+            </p>
+        </div>`;
 };
 
-displaySuccessMessageOnSignup = (message) => {
-  msg_signup.innerHTML = `
-    <div class="alert success">
-      <p class="text">
-        <strong>${message}</strong>
-      </p>
-    </div>`;
+// Function to display a success message in the sign-up form
+const displaySuccessMessageOnSignup = (message) => {
+  msgSignup.innerHTML = `
+        <div class="alert success">
+            <p class="text">
+                <strong>${message}</strong>
+            </p>
+        </div>`;
 };
 
+// Function to clear error/success messages in the sign-up form
 const clearMessagesOnSignup = () => {
-  msg_signup.innerHTML = '';
+  msgSignup.innerHTML = '';
 };
 
+// Function to validate the sign-up form inputs
+const validateSignupForm = () => {
+  // Validate each input field and return true if all inputs are valid
+  const isNameValid = isValidOnSignUp(nameEl, /^[a-zA-Z\s]+$/, 'Username should only contain letters and be between 4 and 22 characters in length.');
+  const isEmailValid = isValidOnSignUp(emailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
+  const isContactValid = isValidOnSignUp(contactEl, /^(\+254|0)?[071]\d{8}$/, "Contact number must begin with +254 or 0 then followed by 1 or 7, and other 7 digits");
+  const isPasswordValid = isValidOnSignUp(passwordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
+  const checkPasswordMatch = () => {
+    const password = passwordEl.value.trim();
+    const confirmPassword = confirmPasswordEl.value.trim();
+    if (!isRequiredOnSignUp(confirmPassword)) {
+      showErrorOnSignUp(confirmPasswordEl, 'Confirm password cannot be blank.');
+      return false;
+    } else if (password !== confirmPassword) {
+      showErrorOnSignUp(confirmPasswordEl, 'Passwords do not match.');
+      return false;
+    } else {
+      showSuccessOnSignUp(confirmPasswordEl);
+      return true;
+    }
+  };
+  const isConfirmPasswordValid = checkPasswordMatch();
+
+  return isNameValid && isEmailValid && isContactValid && isPasswordValid && isConfirmPasswordValid;
+};
+
+// Handle sign-up form submission
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // Prevent form submission
 
   clearMessagesOnSignup(); // Clear previous messages
 
-  let isFormValidOnSignUp = true;
-
-  if (!checkName()) {
-    isFormValidOnSignUp = false;
-  }
-
-  if (!checkEmail()) {
-    isFormValidOnSignUp = false;
-  }
-
-  if (!checkContact()) {
-    isFormValidOnSignUp = false;
-  }
-
-  if (!checkPassword()) {
-    isFormValidOnSignUp = false;
-  }
-
-  if (!checkPasswordMatch()) {
-    isFormValidOnSignUp = false;
-  }
-
-  if (isFormValidOnSignUp) {
-    const formType = formTypeEl.value;
+  if (validateSignupForm()) {
+    const formType = signupFormTypeEl.value;
     const username = nameEl.value;
     const email = emailEl.value;
     const contact = contactEl.value;
     const password = passwordEl.value;
 
-    // Construct request body object
-    const requestBodyOnSignUp = {
+    const requestBody = {
       formType,
       username,
       email,
@@ -127,24 +114,26 @@ signupForm.addEventListener('submit', async (e) => {
     };
 
     try {
-      const responseOnSignUp = await fetch('assets/php/action.php', {
+      const response = await fetch('assets/php/action.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBodyOnSignUp)
+        body: JSON.stringify(requestBody)
       });
 
-      if (responseOnSignUp.ok) {
-        const responseOnSignUpData = await responseOnSignUp.json();
-        if (responseOnSignUpData.success) {
-          displaySuccessMessageOnSignup(responseOnSignUpData.message);
+      if (response.ok) {
+        const responseData = await response.json();
+        if (responseData.success) {
+          displaySuccessMessageOnSignup(responseData.message);
         } else {
-          displayErrorMessageOnSignup(responseOnSignUpData.message);
+          displayErrorMessageOnSignup(responseData.message);
         }
+      } else {
+        throw new Error('Network response was not OK.');
       }
     } catch (error) {
-      displayErrorMessageOnSignup('Some error occurred try again.');
+      displayErrorMessageOnSignup('Some error occurred. Please try again.');
     }
   }
 });
