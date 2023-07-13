@@ -2,13 +2,25 @@
 
 require_once 'utils.php';
 
+switch ($_SESSION['userType']) {
+    case 'client':
+        Utils::redirect_to('http://127.0.0.1/ticketingapp/interfaces/events.php');
+        break;
+    case 'admin':
+        Utils::redirect_to('http://127.0.0.1/ticketingapp/interfaces/admin.php');
+        break;
+    default:
+        break;
+}
+
 // coalescing operator `??`
 // checks if a variable exists and is not null,
 // and if it doesn't, it returns a default value
 $message = $_SESSION['success'] ?? $_SESSION['error'] ?? null;
+$contactUsMsg = $_SESSION['contactUsMessage'] ?? null;
 
 // `unset()` function destroys a variable. Once a variable is unset, it's no longer accessible
-unset($_SESSION['success'], $_SESSION['error']);
+unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
 
 ?>
 
@@ -54,61 +66,74 @@ unset($_SESSION['success'], $_SESSION['error']);
     <div class="modal" id="signup">
         <div class="form-box">
             <h1>Sign Up</h1>
-            <form id="signupForm" method="POST" action="assets/php/action.php">
-                <div class="input-group">
-                    <div class="input-field">
-                        <input type="text" name="username" placeholder="Username">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" name="email" placeholder="Email">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" name="contact" placeholder="Contact">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" name="password" placeholder="Password">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" name="confirm_password" placeholder="Confirm Password">
-                        <div class="error"></div>
-                    </div>
+            <small></small>
+            <form id="signupForm">
+                <input type="hidden" name="formType-signup" value="signup">
+                <div class="form-field">
+                    <input type="text" name="username" placeholder="Username">
+                    <div class="error"></div>
                 </div>
+                <div class="form-field">
+                    <input type="text" name="email" placeholder="Email">
+                    <div class="error"></div>
+                </div>
+                <div class="form-field">
+                    <input type="text" name="contact" placeholder="Contact">
+                    <div class="error"></div>
+                </div>
+                <div class="form-field">
+                    <input type="text" name="password" placeholder="Password">
+                    <div class="error"></div>
+                </div>
+                <div class="form-field">
+                    <input type="text" name="confirm_password" placeholder="Confirm Password">
+                    <div class="error"></div>
+                </div>
+
                 <div class="btn-field">
-                    <button type="button" style="background-color: #999999; margin-top: 120px" id="signupClose">Close</button>
-                    <button type="submit" style="margin-top: 120px" name="signup-btn">Signup &rarr;</button>
+                    <button type="button" class="close" id="signupClose">Close</button>
+                    <button type="submit" class="btn" name="signup-btn">Signup &rarr;</button>
                 </div>
             </form>
-            <br>
+            <ul class="inline-links">
+                <li class="inline-links-item">
+                    <span>Already got an account? &#160&#160&#160<a class="link" href="index.php">Sign in</a></span>
+                </li>
+            </ul>
         </div>
     </div>
+
+
     <!--Signin Modal-->
     <div class="modal" id="signin">
         <div class="form-box">
             <h1>Login</h1>
-            <form id="signinForm" method="POST" action="signin.php">
-                <div class="input-group">
-                    <div class="input-field">
-                        <input type="text" id="signinemail" name="signinemail" placeholder="Email">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" id="signinpassword" name="signinpassword" placeholder="Password">
-                        <div class="error"></div>
-                    </div>
-                    <a href="#" style="font-size:13px; text-align: left; float:left;">Forgotten Password?</a>
+            <small></small>
+            <form id="signinForm">
+                <input type="hidden" name="formType-signin" value="signin">
+                <div class="form-field">
+                    <input type="text" id="signinemail" name="signin-email" placeholder="Email">
+                    <div class="error"></div>
+                </div>
+                <div class="form-field">
+                    <input type="text" id="signinpassword" name="signin-password" placeholder="Password">
+                    <div class="error"></div>
                 </div>
                 <div class="btn-field">
-                    <button type="button" style="background-color: #999999" id="signinClose">Close</button>
-                    <button type="submit" name="login-btn">Login &rarr;</button>
+                    <button type="button" class="close" id="signinClose">Close</button>
+                    <button type="submit" class="btn" name="signin-btn">Login &rarr;</button>
                 </div>
             </form>
+            <ul class="inline-links">
+                <li class="inline-links-item">
+                    <a href="#"><span class="text">Forgotten Password?</span></a>
+                </li>
+                <li class="inline-links-item">
+                    <a href="#"><span class="text">Sign Up</span></a>
+                </li>
+            </ul>
         </div>
     </div>
-
 
     <!--About Us Section-->
     <div id="about">
@@ -130,7 +155,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <br>
                 <button type="button" id="contactUsBtn" class="contact-us">Contact Us </button>
                 <!--  `<?php ?>` tags is used to output the value of given php variable -->
-                <?= $message ?>
+                <?= $contactUsMsg ?>
             </div>
         </section>
     </div>
@@ -140,29 +165,27 @@ unset($_SESSION['success'], $_SESSION['error']);
     <div class="modal" id="contactus">
         <div class="form-box">
             <h1>Any Inquiries</h1>
-            <form id="contactForm" method="post" action="assets/php/action.php">
-                <div class="input-group">
-                    <div class="input-field">
-                        <input type="text" name="email_from" placeholder="Your email">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" name="subject" placeholder="Subject:">
-                        <div class="error"></div>
-                    </div>
-                    <div class="input-field">
-                        <textarea type="text" name="message" placeholder="Message" style="height: 150px; width:1000px; background-color:#eaeaea;"></textarea>
-                        <div class="error"></div>
-                    </div>
+            <form id="contactForm">
+
+                <div class="form-field">
+                    <input type="text" name="email_from" placeholder="Your email">
+                    <div class="error"></div>
+                </div>
+                <div class="form-field">
+                    <input type="text" name="subject" placeholder="Subject:">
+                    <div class="error"></div>
+                </div>
+                <div class="form-field">
+                    <textarea type="text" name="message" placeholder="Message"></textarea>
+                    <div class="error"></div>
                 </div>
                 <div class="btn-field">
-                    <button type="button" style="background-color: #999999; margin-top:90px;" id="contactClose">Close</button>
-                    <button type="submit" name="contact-btn" style="background-color: green; margin-top: 90px;">Send &rarr;</button>
+                    <button type="button" class="close" id="contactClose">Close</button>
+                    <button type="submit" name="contact-btn" class="btn-send">Send &rarr;</button>
                 </div>
             </form>
         </div>
     </div>
-
     <!--Footer-->
     <footer class="footer">
         <div class="container">
@@ -188,9 +211,9 @@ unset($_SESSION['success'], $_SESSION['error']);
         </div>
     </footer>
 
-    <script src="assets/js/modals.js"></script>
     <script src="assets/js/signup.js"></script>
     <script src="assets/js/signin.js"></script>
+    <script src="assets/js/modals.js"></script>
     <script src="assets/js/contact.js"></script>
 
 </body>
