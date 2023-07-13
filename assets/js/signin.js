@@ -1,104 +1,103 @@
 const signinForm = document.getElementById("signinForm");
-const signinformTypeEl = document.querySelector('[name="formType"]');
+const signinFormTypeEl = document.querySelector('[name="formType-signin"]');
 const signinEmailEl = document.querySelector('[name="signin-email"]');
 const signinPasswordEl = document.querySelector('[name="signin-password"]');
-const msg_signin = document.querySelector('small');
-
-const isRequiredOnSignIn = value => Boolean(value);
+const msgSignin = document.querySelector('#signin small');
 
 const showErrorOnSignIn = (element, message) => {
-  const inputField = element.parentElement;
-  const errorDisplay = inputField.querySelector('.error');
+    const inputField = element.parentElement;
+    const errorDisplay = inputField.querySelector('.error');
 
-  errorDisplay.innerText = message;
-  inputField.classList.add('error');
-  inputField.classList.remove('success');
+    errorDisplay.innerText = message;
+    inputField.classList.add('error');
+    inputField.classList.remove('success');
 };
 
 const showSuccessOnSignIn = element => {
-  const inputField = element.parentElement;
-  const errorDisplay = inputField.querySelector('.error');
+    const inputField = element.parentElement;
+    const errorDisplay = inputField.querySelector('.error');
 
-  errorDisplay.innerText = '';
-  inputField.classList.add('success');
-  inputField.classList.remove('error');
+    errorDisplay.innerText = '';
+    inputField.classList.add('success');
+    inputField.classList.remove('error');
 };
+
+// Function to display an error message in the sign-in form
+const displayErrorMessageOnSignin = (message) => {
+    msgSignin.innerHTML = `
+<div class="alert error">
+    <p class="text">
+        <strong>${message}</strong>
+    </p>
+</div>`;
+};
+
+const isRequiredOnSignIn = value => Boolean(value);
 
 const isValidOnSignIn = (input, pattern, message) => {
-  const value = input.value.trim();
-  if (!isRequiredOnSignIn(value)) {
-    showErrorOnSignIn(input, `${input.name} cannot be blank.`);
-    return false;
-  } else if (!pattern.test(value)) {
-    showErrorOnSignIn(input, message);
-    return false;
-  } else {
-    showSuccessOnSignIn(input);
-    return true;
-  }
-};
-
-const checkEmailOnSignIn = () => isValidOnSignIn(signinEmailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
-const checkPasswordOnSignIn = () => isValidOnSignIn(signinPasswordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
-
-const displayErrorMessageOnSignIn = (message) => {
-  msg_signin.innerHTML = `
-    <div class="alert error">
-      <p class="text">
-        <strong>${message}</strong>
-      </p>
-    </div>`;
-};
-
-
-const clearMessagesOnSignIn = () => {
-  msg_signin.innerHTML = '';
-};
-
-// Check each input field for errors and
-// prevent form submission if any fields has errors
-signinForm.addEventListener('submit', async (e) => {
-  e.preventDefault(); // Prevent form submission
-
-  clearMessagesOnSignIn(); // Clear previous messages
-
-  let isFormValidOnSignIn = true;
-
-  if (!checkEmailOnSignIn()) {
-    isFormValidOnSignIn = false;
-  }
-
-  if (!checkPasswordOnSignIn()) {
-    isFormValidOnSignIn = false;
-  }
-
-  if (isFormValidOnSignIn) {
-    const formType = signinformTypeEl.value;
-    const emailSignIn = signinEmailEl.value;
-    const passwordSignIn = signinPasswordEl.value;
-
-    // Construct request body object
-    const requestBodyOnSignIn = {
-      formType,
-      emailSignIn,
-      passwordSignIn
-    };
-
-    try {
-      const responseOnSignIn = await fetch('assets/php/action.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBodyOnSignIn)
-      });
-
-      if (responseOnSignIn.ok) {
-        const responseOnSignInData = await responseOnSignIn.json();
-        displayErrorMessageOnSignIn(responseOnSignInData.message);
-      }
-    } catch (error) {
-      displayErrorMessageOnSignIn('An error occurred during the network call.');
+    const value = input.value.trim();
+    if (!isRequiredOnSignIn(value)) {
+        showErrorOnSignIn(input, `${input.name} cannot be blank.`);
+        return false;
+    } else if (!pattern.test(value)) {
+        showErrorOnSignIn(input, message);
+        return false;
+    } else {
+        showSuccessOnSignIn(input);
+        return true;
     }
-  }
+};
+
+// Function to clear error/success messages in the sign-in form
+const clearMessagesOnSignin = () => {
+    msgSignin.innerHTML = '';
+};
+
+// Function to validate the sign-in form inputs
+const validateSigninForm = () => {
+    // Validate each input field and return true if all inputs are valid
+    const isEmailValid = isValidOnSignIn(signinEmailEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
+    const isPasswordValid = isValidOnSignIn(signinPasswordEl, /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/, 'Password must have at least 8 characters that include at least 1 lowercase character, 1 uppercase character, 1 number, and 1 special character.');
+
+    return isEmailValid && isPasswordValid;
+};
+
+// Handle sign-in form submission
+signinForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Prevent form submission
+
+    clearMessagesOnSignin(); // Clear previous messages
+
+    if (validateSigninForm()) {
+        const formType = signinFormTypeEl.value;
+        const email = signinEmailEl.value;
+        const password = signinPasswordEl.value;
+
+        const requestBody = {
+            formType,
+            email,
+            password
+        };
+
+        try {
+            const response = await fetch('assets/php/action.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                if (!responseData.success) {
+                    displayErrorMessageOnSignin(responseData.message);
+                }
+            } else {
+                throw new Error('Network response was not OK.');
+            }
+        } catch (error) {
+            displayErrorMessageOnSignin('An error occurred during the network call.');
+        }
+    }
 });
