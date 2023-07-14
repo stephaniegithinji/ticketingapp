@@ -182,3 +182,34 @@ if (isset($_POST["contact-btn"])) {
         Utils::redirect_with_message('../../index.php', 'error', 'Opps...Some error occurred: ' . $e->getMessage());
     }
 }
+
+if (isset($_POST["purchase-ticket-btn"])) {
+    try {
+        $eventId = isset($_POST["eventId"]) && !empty($_POST["eventId"]) ? Utils::sanitizeInput($_POST["eventId"]) : Utils::redirect_with_message('../../interfaces/events.php', 'error', 'Event Id cannot be blank!');
+        $userId = $action->fetchUserByEmail($_SESSION['clientEmail']);
+        $no_of_tckts = isset($_POST["number_of_tickets"]) ? (int)$_POST["number_of_tickets"] : 0;
+        
+        $price = isset($_POST["ticket_price"]) ? (float)$_POST["ticket_price"] : 0.0;
+        $total_price = $no_of_tckts * $price;
+        // Utils::redirect_with_message('../../interfaces/events.php', 'success', 'Tiko ni:' .$no_of_tckts . 'na bei ni: ' . $price . 'na total: '.$total_price);
+
+
+        if ($action->createReservation($userId, $eventId, $no_of_tckts, $total_price)) {
+            Utils::redirect_with_message('../../interfaces/events.php', 'success', 'Reservation successfully');
+        } else {
+            Utils::redirect_with_message('../../interfaces/events.php', 'error', 'Failed to create reservation');
+            return;
+        }
+
+        // if ($action->("adm1n.tickectok@gmail.com", $sub, $mailBody)) {
+        //     Utils::redirect_with_message('../../index.php', 'success', 'Message sent! Thanks for contacting us.');
+        //     return;
+        // } else {
+        //     Utils::redirect_with_message('../../index.php', 'error', 'Email not sent. An error was encountered.');
+        //     return;
+        // }
+    } catch (Exception $e) {
+        // Handle exceptions by returning an error mailBody to user
+        Utils::redirect_with_message('../../index.php', 'error', 'Opps...Some error occurred: ' . $e->getMessage());
+    }
+}
