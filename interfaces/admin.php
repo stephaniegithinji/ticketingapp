@@ -155,7 +155,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
 
 
     <div class="modal" id="editEvent">
-        <div class="form-box" style="height: 770px">
+        <div class="form-box" style="height: 720px">
             <h2 id="event-name-edt"></h2>
             <form method="POST" action="../assets/php/admin-action.php">
                 <input type="hidden" name="eventId" value="<?= $card['id'] ?>">
@@ -163,10 +163,10 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                     <label>Event Name:</label>
                     <input type="text" name="event_name" placeholder="Event Name" value="<?= $card['event_name'] ?>">
                 </div>
-                <!-- <div class="form-field">
+                <div class="form-field">
                     <label>Event Date:</label>
-                    <input type="date" name="date"  value="<?= $card['date'] ?>">
-                </div> -->
+                    <input type="date" name="date"  value="<?= $card['date'] ?>" min="<?php echo date('Y-m-d'); ?>" max="<?php echo date('Y-m-d', strtotime('+1 year')); ?>>
+                </div>
                 <div class="form-field">
                     <label>Event Venue:</label>
                     <input type="text" name="venue" placeholder="Venue" value="<?= $card['venue'] ?>">
@@ -193,8 +193,9 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
     </div>
 
     <div class="modal" id="deleteEvent">
-        <div class="form-box" style="height: 350px;">
-            <h1 id="event-name-edt-del"></h1>
+        <div class="form-box" style="height: 280px;">
+            <h2 id="event-name-edt-del"></h2>
+            <?= str_repeat('<br>', 2); ?>
             <form method="POST" action="../assets/php/admin-action.php">
                 <input type="hidden" name="eventId" value="<?= $card['id'] ?>">
                 <h2>Are you sure you want to delete this Event?</h2>
