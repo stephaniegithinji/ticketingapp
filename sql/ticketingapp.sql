@@ -23,6 +23,10 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
+CREATE DATABASE ticketingapp;
+USE ticketingapp;
+
+
 --
 -- Table structure for table `events`
 --
