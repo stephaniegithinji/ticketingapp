@@ -82,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signup
         ];
     }
     echo json_encode($response);
+    die();
 }
 
 
@@ -141,8 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signin
                 'success' => true,
                 'message' => $redirectNode
             ];
-
-            //     Utils::redirect_to($isAdmin ? '../../interfaces/admin.php' : '../../interfaces/events.php');
         } else {
             // User provided incorrect email or password
             $response = [
@@ -159,36 +158,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signin
     }
 
     echo json_encode($response);
+    die();
 }
 
 
-if (isset($_POST["contact-btn"])) {
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'contact') {
     try {
-        $email = isset($_POST["email_from"]) && !empty($_POST["email_from"]) ? Utils::sanitizeInput($_POST["email_from"]) : Utils::redirect_with_message('../../index.php',  'error', 'Email cannot be blank!');
-        $sub = isset($_POST["subject"]) && !empty($_POST["subject"]) ? Utils::sanitizeInput($_POST["subject"]) : Utils::redirect_with_message('../../index.php',  'error', 'Subject cannot be blank!');
-        $message = isset($_POST["message"]) && !empty($_POST["message"]) ? Utils::sanitizeInput($_POST["message"]) : Utils::redirect_with_message('../../index.php',  'error', 'Message cannot be blank!');
+        $email = isset($requestBody["email_from"]) && !empty($requestBody["email_from"]) ? Utils::sanitizeInput($requestBody["email_from"]) : '';
+        $sub = isset($requestBody["subject"]) && !empty($requestBody["subject"]) ? Utils::sanitizeInput($requestBody["subject"]) : '';
+        $message = isset($requestBody["message"]) && !empty($requestBody["message"]) ? Utils::sanitizeInput($requestBody["message"]) : '';
+
+        $errorMessages = [];
+
+        if (empty($email)) {
+            $errorMessages[] = 'Email cannot be blank!';
+        }
+
+        if (empty($sub)) {
+            $errorMessages[] = 'Subject cannot be blank!';
+        }
+
+        if (empty($message)) {
+            $errorMessages[] = 'Message cannot be blank!';
+        }
+
+        if (!empty($errorMessages)) {
+            $errorMessage = '';
+            foreach ($errorMessages as $message) {
+                $errorMessage .= $message;
+            }
+            $response = [
+                'success' => false,
+                'message' => $errorMessage
+            ];
+        }
 
         $mailBody = "You have a new inquiry from" . $email . "<br><br>" . $message;
 
         if (Mailer::sendMail("adm1n.tickectok@gmail.com", $sub, $mailBody)) {
-            Utils::redirect_with_message('../../index.php', 'success', 'Message sent! Thanks for contacting us.');
-            return;
+            $response = [
+                'success' => true,
+                'message' => 'We appreciate you contacting us. One of our colleagues will get back in touch with you soon!'
+            ];
         } else {
-            Utils::redirect_with_message('../../index.php', 'error', 'Email not sent. An error was encountered.');
-            return;
+            $response = [
+                'success' => false,
+                'message' => 'Email not sent. An error was encountered.'
+            ];
         }
     } catch (Exception $e) {
-        // Handle exceptions by returning an error mailBody to user
-        Utils::redirect_with_message('../../index.php', 'error', 'Opps...Some error occurred: ' . $e->getMessage());
+        $response = [
+            'success' => false,
+            'message' => 'Oops... Some error occurred: ' . $e->getMessage()
+        ];
     }
+
+    echo json_encode($response);
+    die();
 }
+
+
 
 if (isset($_POST["purchase-ticket-btn"])) {
     try {
         $eventId = isset($_POST["eventId"]) && !empty($_POST["eventId"]) ? Utils::sanitizeInput($_POST["eventId"]) : Utils::redirect_with_message('../../interfaces/events.php', 'error', 'Event Id cannot be blank!');
         $userId = $action->fetchUserByEmail($_SESSION['clientEmail']);
         $no_of_tckts = isset($_POST["number_of_tickets"]) ? (int)$_POST["number_of_tickets"] : 0;
-        
+
         $price = isset($_POST["ticket_price"]) ? (float)$_POST["ticket_price"] : 0.0;
         $total_price = $no_of_tckts * $price;
         // Utils::redirect_with_message('../../interfaces/events.php', 'success', 'Tiko ni:' .$no_of_tckts . 'na bei ni: ' . $price . 'na total: '.$total_price);
