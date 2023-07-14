@@ -85,3 +85,11 @@
         padding: 3rem;
     }
 }
+
+.box{
+    color: #fcc201; 
+    font-family: 'Fredericka the Great', cursive; 
+    font-size: 40px; 
+    margin-left: 130px; 
+    margin-bottom:40px
+}
