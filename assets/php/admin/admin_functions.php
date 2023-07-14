@@ -14,19 +14,28 @@ class Admin extends Db
 		return true;
 	}
 
-	/* Ask Baha what's going on here */
+
     public function fetchEvents()
 	{
-		$sql = "SELECT * FROM events";
+		$sql = "SELECT * FROM events ORDER BY date DESC";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute();
-		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		return $result;
 	}
 
-    public function editEvent($id, $date, $venue, $time, $ticket_price)
-	{
+    // public function editEvent($id, $date, $venue, $time, $ticket_price)
+	// {
 		
+	// 	return true;
+	// }
+
+	public function editEvent($id, $evname,  $venue, $time, $ticket_price, $tickets_capacity)
+
+	{
+		$sql = "UPDATE events SET event_name = :name, venue = :loc, time = :time, ticket_price = :tck_price, tickets_capacity = :tickets_capacity, updated_at = NOW() WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id, 'name' => $evname, 'loc' => $venue, 'time' => $time, 'tck_price' => $ticket_price, 'tickets_capacity' => $tickets_capacity]);
 		return true;
 	}
 
