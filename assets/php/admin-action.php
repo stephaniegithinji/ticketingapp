@@ -61,13 +61,13 @@ if (isset($_POST["editEventBtn"])) {
     try {
         $eventId = isset($_POST["eventId"]) && !empty($_POST["eventId"]) ? Utils::sanitizeInput($_POST["eventId"]) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Event Id cannot be blank!');
         $eventName = isset($_POST["event_name"]) && !empty($_POST["event_name"]) ? Utils::sanitizeInput($_POST["event_name"]) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Event name cannot be blank!');
-        // $date = isset($_POST["date"]) && !empty($_POST["date"]) ? Utils::sanitizeInput(ucwords($_POST["date"])) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Date cannot be blank!');
+        $date = isset($_POST["date"]) && !empty($_POST["date"]) ? Utils::sanitizeInput($_POST["date"]) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Date cannot be blank!');
         $venue = isset($_POST["venue"]) && !empty($_POST["venue"]) ? Utils::sanitizeInput(ucwords($_POST["venue"])) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Venue cannot be blank!');
         $time = isset($_POST["time"]) && !empty($_POST["time"]) ? date('H:i:s', strtotime(Utils::sanitizeInput($_POST["time"]))) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Time cannot be blank!');
         $ticket_price = isset($_POST["ticket_price"]) && !empty($_POST["ticket_price"]) ? Utils::sanitizeInput(ucwords($_POST["ticket_price"])) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Ticket price cannot be blank!');
         $ticket_capacity = isset($_POST["ticket_capacity"]) && !empty($_POST["ticket_capacity"]) ? Utils::sanitizeInput(ucwords($_POST["ticket_capacity"])) : Utils::redirect_with_message('../../interfaces/admin.php', 'error', 'Ticket capacity cannot be blank!');
 
-        if ($action->editEvent($eventId, $eventName, $venue, $time, $ticket_price, $ticket_capacity)) {
+        if ($action->editEvent($eventId, $eventName, $venue, $date, $time, $ticket_price, $ticket_capacity)) {
             Utils::redirect_with_message('../../interfaces/admin.php', 'success', 'Event data updated successfully');
         } else {
             // Failed to move the uploaded image
