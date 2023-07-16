@@ -69,6 +69,26 @@ class Client extends Db
 		return $result;
 	}
 
+	public function fetchEventDateById(string $id)
+	{
+		$sql = "SELECT date FROM events WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		if ($result) {
+			$eventDate = $result['date'];
+			$currentDate = date('Y-m-d'); // Get the current date
+
+			$result['hasPassed'] = $eventDate < $currentDate;
+		}
+
+		return $result;
+	}
+
+
+
+
 	public function createReservation($userId, $eventId, $no_tckts, $total)
 	{
 		$sql = "INSERT INTO reservations(number_of_tickets, total_amount, users_id, events_id)VALUES(:no_tckts, :t_amount, :userId, :eventId)";
@@ -77,6 +97,45 @@ class Client extends Db
 		return true;
 	}
 
+	/**
+	 * @param string $tablename
+	 * @return array
+	 * @desc Returns count of Rows based on the method parameters
+	 */
+	public function totalCount($tableName)
+	{
+		$sql = "SELECT COUNT(*) FROM $tableName";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute();
+		$count = $stmt->fetchColumn();
+		return $count;
+	}
+
+	/**
+	 * Loads data from the "reservations" table.
+	 *
+	 * @return array An array containing the retrieved data.
+	 */
+	public function reservationsPerPage($current_page)
+	{
+		$offset = ($current_page - 1) * 5;
+
+		$sql = "SELECT * FROM reservations ORDER BY created_at LIMIT :offset, :records_per_page";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+		$stmt->bindValue(':records_per_page', 5, PDO::PARAM_INT);
+		$stmt->execute();
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		return $result;
+	}
+
+
+	public function getEventNameFromId($id)
+	{
+		$sql = "SELECT event_name FROM events WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result['event_name'];
+	}
 }
-
-
