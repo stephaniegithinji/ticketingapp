@@ -1,5 +1,7 @@
 <?php
 
+
+
 require_once '../utils.php';
 
 require_once  '../assets/php/client_functions.php';
@@ -49,7 +51,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
       <h1 class="logo" style="font-size: 40px;">TickeTok </h1>
       <ul style="font-size: 15px;">
         <li><a href="#">Hi, <?= $currentlyLoggedInUser ?></li>
-        <li><a href="events.php">Back</a></li>
+        <li><a href="events.php">View events</a></li>
         <li><a href="../assets/php/logout.php">Logout</a></li>
       </ul>
     </div>
@@ -77,19 +79,12 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
         </thead>
         <?php foreach ($reservation_data as $reservation) : ?>
           <tr>
+            <!-- < ?= ?> is a shorthand syntax for the < ? php echo ?> statement -->
             <td><?= $reservation['id'] ?></td>
             <td><?= $interfaces->getEventNameFromId($reservation['events_id']) ?></td>
-            <td><?= date('M d, Y', strtotime($interfaces->fetchEventDateById($reservation['events_id'])['date'])) ?></td>
+            <td><?= ($eventDate = $interfaces->fetchEventDateById($reservation['events_id'])['date']) ? date('D, M d, Y', strtotime($eventDate)) : (($fromDate = $interfaces->fetchEventDateById($reservation['events_id'])['from_date']) && ($toDate = $interfaces->fetchEventDateById($reservation['events_id'])['to_date']) ? (date('D, M d, Y', strtotime($fromDate)) . ' - ' . date('D, M d, Y', strtotime($toDate))) : 'N/A') ?></td>
             <td>
-              <?php if ($interfaces->fetchEventDateById($reservation['events_id'])['hasPassed']) : ?>
-                <p class="active">
-                  <strong>Due</strong>
-                </p>
-              <?php else : ?>
-                <p class="not-active">
-                  <strong>Passed</strong>
-                </p>
-              <?php endif; ?>
+              <?= ($interfaces->fetchEventDateById($reservation['events_id'])['hasPassed']) ? '<p class="not-active"><strong>Passed</strong></p>' : '<p class="active"><strong>Due</strong></p>' ?>
             </td>
             <td><?= $reservation['number_of_tickets'] ?></td>
             <td><?= $reservation['total_amount'] ?></td>
@@ -107,8 +102,6 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
       </div>
 
       <?= str_repeat('<br>', 4); ?>
-
-
 
     </div>
   <?php endif; ?>
