@@ -20,51 +20,82 @@ const editClose = document.getElementById("editClose");
 
 // Iterate over each button in the editBtns array.
 editBtns.forEach(editBtn => {
-   // Add an event listener to each button that triggers on a click event.
    editBtn.addEventListener("click", (event) => {
-      // Get the closest element with the class "column-item" from the clicked button.
-      const card = event.target.closest(".column-item");
+       const card = event.target.closest(".column-item");
 
-      // Extract the name of the event from the card.
-      const name = card.querySelector(".card-title").textContent.trim().split(': ')[1];
+       const name = card.querySelector(".card-title").textContent;
 
-      // Extract and format the date of the event from the card.
-      const formattedDate = (([dayMonth, year]) => `${year}-${('0' + (["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(dayMonth.split(" ")[0]) + 1)).slice(-2)}-${dayMonth.split(" ")[1]}`)(card.querySelector('ul li:nth-child(1)').textContent.slice(6).trim().split(", "));
+       let dateInput = card.querySelector("input[name='date']");
+       let fromDateInput = card.querySelector("input[name='from_date']");
+       let toDateInput = card.querySelector("input[name='to_date']");
 
-      // Extract the venue of the event from the card.
-      const venue = card.querySelector("ul li:nth-child(2)").textContent.slice(7).trim();
+       let date, from_date, to_date;
+       if (dateInput) {
+           date = dateInput.value;
+       } else if(fromDateInput && toDateInput) {
+           from_date = fromDateInput.value;
+           to_date = toDateInput.value;
+       }
 
-      // Extract the time of the event from the card.
-      const time = card.querySelector("ul li:nth-child(3)").textContent.slice(6).trim();
+       const venue = card.querySelector(".venue").textContent;
 
-      // Extract the ticket price of the event from the card.
-      const ticketPrice = card.querySelector("ul li:nth-child(4)").textContent.slice(15).trim();
+       const time = card.querySelector("input[name='time']").value;
 
-      // Extract the tickets capacity of the event from the card.
-      const ticketsCapacity = card.querySelector("ul li:nth-child(5)").textContent.slice(18).trim();
+       const ticket_price = card.querySelector(".tck").textContent.split(": ")[1];
 
-      // Extract the event id from the closest element with the tag "td".
-      const eventId = card.closest("td").dataset.id;
+       const modal = document.querySelector("#editEvent");
+       modal.querySelector("#event-name-edt").textContent = `Edit event "${name}"`;
+       modal.querySelector("input[name='eventId']").value = event.target.closest("td").dataset.id;
+       modal.querySelector("input[name='event_name']").value = name;
+       modal.querySelector("input[name='venue']").value = venue;
+       modal.querySelector("input[name='time']").value = time;
+       modal.querySelector("input[name='ticket_price']").value = ticket_price;
 
-      // Get the form element from the editModal.
-      const form = editModal.querySelector("form");
+       let modalDateInput = modal.querySelector("input[name='date']");
+       let modalFromDateInput = modal.querySelector("input[name='from_date']");
+       let modalToDateInput = modal.querySelector("input[name='to_date']");
 
-      // Fill the form with the extracted event details.
-      form.querySelector('input[name="eventId"]').value = eventId;
-      form.querySelector('input[name="event_name"]').value = name;
-      form.querySelector('input[name="date"]').value = formattedDate;
-      form.querySelector('input[name="venue"]').value = venue;
-      form.querySelector('input[name="time"]').value = time;
-      form.querySelector('input[name="ticket_price"]').value = ticketPrice.replace(/[^\d]/g, "");
-      form.querySelector('input[name="ticket_capacity"]').value = ticketsCapacity.replace(/[^\d]/g, "");
+       let dateLabel = modal.querySelector("label[for='date']");
+       let fromDateLabel = modal.querySelector("label[for='from_date']");
+       let toDateLabel = modal.querySelector("label[for='to_date']");
 
-      // Update the modal's title with the event's name.
-      editModal.querySelector("#event-name-edt").textContent = `Edit "${name}" event details`;
+       if (date) {
+           if (modalDateInput) {
+               modalDateInput.value = date;
+               modalDateInput.style.display = "";
+           }
+           if (dateLabel) dateLabel.style.display = "";
 
-      // Display the editModal.
-      editModal.style.display = "block";
+           if (modalFromDateInput) modalFromDateInput.style.display = "none";
+           if (fromDateLabel) fromDateLabel.style.display = "none";
+
+           if (modalToDateInput) modalToDateInput.style.display = "none";
+           if (toDateLabel) toDateLabel.style.display = "none";
+
+       } else if (from_date && to_date) {
+           if (modalFromDateInput) {
+               modalFromDateInput.value = from_date;
+               modalFromDateInput.style.display = "";
+           }
+           if (fromDateLabel) fromDateLabel.style.display = "";
+
+           if (modalToDateInput) {
+               modalToDateInput.value = to_date;
+               modalToDateInput.style.display = "";
+           }
+           if (toDateLabel) toDateLabel.style.display = "";
+
+           if (modalDateInput) modalDateInput.style.display = "none";
+           if (dateLabel) dateLabel.style.display = "none";
+       }
+
+       let editModal = document.querySelector("#editEvent");
+       editModal.style.display = "block";
    });
 });
+
+
+
 
 
 // Function to close modal
@@ -82,7 +113,7 @@ var deleteClose = document.getElementById("deleteClose");
 deleteBtns.forEach(deleteBtn => {
    deleteBtn.addEventListener("click", (event) => {
       const card = event.target.closest(".column-item");
-      const name = card.querySelector(".card-title").textContent.trim().split(': ')[1];
+      const name = card.querySelector(".card-title").textContent;
 
       const eventId = card.closest("td").dataset.id;
       const form = deleteModal.querySelector("form");
