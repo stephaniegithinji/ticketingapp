@@ -53,12 +53,20 @@ class Client extends Db
 
 	public function fetchEvents()
 	{
-		$sql = "SELECT * FROM events ORDER BY date DESC";
+		$sql = "SELECT *,
+            CASE
+                WHEN date IS NULL THEN CONCAT(from_date, ' - ', to_date)
+                ELSE date
+            END AS event_date
+            FROM events
+            WHERE (date >= CURDATE() OR from_date >= CURDATE())
+            ORDER BY date DESC";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute();
 		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		return $result;
 	}
+
 
 	public function fetchUserByEmail(string $email)
 	{
@@ -71,23 +79,26 @@ class Client extends Db
 
 	public function fetchEventDateById(string $id)
 	{
-		$sql = "SELECT date FROM events WHERE id = :id";
+		$sql = "SELECT date, from_date, to_date FROM events WHERE id = :id";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(['id' => $id]);
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		if ($result) {
-			$eventDate = $result['date'];
-			$currentDate = date('Y-m-d'); // Get the current date
+			if ($result['date'] === null) {
+				// If the 'date' column is null, return the 'from_date' and 'to_date' columns
+				$result['eventDate'] = $result['from_date'] . ' - ' . $result['to_date'];
+			} else {
+				// If the 'date' column has a value, return it as the event date
+				$result['eventDate'] = $result['date'];
+			}
 
-			$result['hasPassed'] = $eventDate < $currentDate;
+			$currentDate = date('Y-m-d'); // Get the current date
+			$result['hasPassed'] = $result['eventDate'] < $currentDate;
 		}
 
 		return $result;
 	}
-
-
-
 
 	public function createReservation($userId, $eventId, $no_tckts, $total)
 	{
@@ -120,14 +131,21 @@ class Client extends Db
 	{
 		$offset = ($current_page - 1) * 5;
 
-		$sql = "SELECT * FROM reservations ORDER BY created_at LIMIT :offset, :records_per_page";
+		$sql = "SELECT r.*, e.date
+            FROM reservations AS r
+            JOIN events AS e ON r.events_id = e.id
+            ORDER BY e.date ASC
+            LIMIT :offset, :records_per_page";
+
 		$stmt = $this->conn->prepare($sql);
 		$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 		$stmt->bindValue(':records_per_page', 5, PDO::PARAM_INT);
 		$stmt->execute();
 		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 		return $result;
 	}
+
 
 
 	public function getEventNameFromId($id)
