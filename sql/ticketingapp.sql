@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 14, 2023 at 03:33 AM
+-- Generation Time: Jul 17, 2023 at 11:52 AM
 -- Server version: 10.11.2-MariaDB-1
 -- PHP Version: 8.2.5
 
@@ -23,10 +23,6 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
-CREATE DATABASE ticketingapp;
-USE ticketingapp;
-
-
 --
 -- Table structure for table `events`
 --
@@ -34,28 +30,32 @@ USE ticketingapp;
 CREATE TABLE `events` (
   `id` int(11) NOT NULL,
   `event_name` varchar(50) NOT NULL,
-  `date` date NOT NULL,
+  `date` date DEFAULT NULL,
   `venue` varchar(50) NOT NULL,
   `time` time DEFAULT NULL,
   `ticket_price` mediumint(7) NOT NULL,
   `tickets_capacity` mediumint(7) NOT NULL,
   `banner` varchar(100) NOT NULL,
   `created_at` timestamp NOT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `from_date` date DEFAULT NULL,
+  `to_date` date DEFAULT NULL,
+  `event_type_name` enum('Entertainment','Conferencing','Movies & Theatre','Sports','Free events') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `events`
 --
 
-INSERT INTO `events` (`id`, `event_name`, `date`, `venue`, `time`, `ticket_price`, `tickets_capacity`, `banner`, `created_at`, `updated_at`) VALUES
-(6, 'Baha &amp; steph events', '2023-07-26', 'Ruaka', '20:10:00', 3500, 1000, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:08:33', '2023-07-14 00:44:10'),
-(7, '420 sesh', '2023-07-19', 'Kwa Mathee', '17:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:26', '2023-07-14 00:44:38'),
-(8, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:34', '0000-00-00 00:00:00'),
-(9, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:39', '0000-00-00 00:00:00'),
-(10, 'Soulfest', '2023-07-20', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:47', '0000-00-00 00:00:00'),
-(11, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:52', '0000-00-00 00:00:00'),
-(12, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:57', '0000-00-00 00:00:00');
+INSERT INTO `events` (`id`, `event_name`, `date`, `venue`, `time`, `ticket_price`, `tickets_capacity`, `banner`, `created_at`, `updated_at`, `from_date`, `to_date`, `event_type_name`) VALUES
+(6, 'Baha &amp; Steph Ent', '2023-07-22', 'Ruaka', '20:10:00', 3500, 1000, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:08:33', '2023-07-16 19:49:56', NULL, NULL, 'Entertainment'),
+(7, '420 sesh', '2023-07-21', 'Kwa Mathee', '17:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:26', '2023-07-16 11:34:16', NULL, NULL, 'Entertainment'),
+(8, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:34', '0000-00-00 00:00:00', NULL, NULL, 'Entertainment'),
+(9, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:39', '0000-00-00 00:00:00', NULL, NULL, 'Entertainment'),
+(10, 'Soulfest', '2023-07-14', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:47', '2023-07-14 21:53:04', NULL, NULL, 'Entertainment'),
+(11, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:52', '0000-00-00 00:00:00', NULL, NULL, 'Entertainment'),
+(12, 'Soulfest', '2023-07-15', 'Ngong Racecourse', '21:10:00', 1500, 800, '../assets/images/banners/64b059c15e663.jpg', '2023-07-13 20:13:57', '0000-00-00 00:00:00', NULL, NULL, 'Entertainment'),
+(14, 'Men&#039;s Conference', NULL, 'KICC', '20:02:00', 1000, 200, '../assets/images/banners/64b4144eadab7.png', '2023-07-16 16:01:18', '0000-00-00 00:00:00', '2023-07-21', '2023-07-22', 'Entertainment');
 
 -- --------------------------------------------------------
 
@@ -67,16 +67,24 @@ CREATE TABLE `reservations` (
   `id` int(11) NOT NULL,
   `number_of_tickets` int(5) NOT NULL,
   `total_amount` int(20) NOT NULL,
-  `users_id` int(11) NOT NULL,
-  `events_id` int(11) NOT NULL
+  `users_email` varchar(50) NOT NULL,
+  `events_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `reservations`
 --
 
-INSERT INTO `reservations` (`id`, `number_of_tickets`, `total_amount`, `users_id`, `events_id`) VALUES
-(2, 2, 7000, 7, 6);
+INSERT INTO `reservations` (`id`, `number_of_tickets`, `total_amount`, `users_email`, `events_id`, `created_at`) VALUES
+(2, 2, 7000, 'me@stephiiee.dev', 6, '2023-07-16 11:53:34'),
+(3, 3, 4500, 'me@stephiiee.dev', 12, '2023-07-16 11:53:34'),
+(4, 2, 7000, 'me@stephiiee.dev', 6, '2023-07-16 11:53:34'),
+(5, 2, 7000, 'me@stephiiee.dev', 6, '2023-07-16 11:53:34'),
+(6, 2, 7000, 'me@stephiiee.dev', 6, '2023-07-16 11:53:34'),
+(7, 2, 7000, 'me@stephiiee.dev', 6, '2023-07-16 11:53:34'),
+(8, 2, 7000, 'me@stephiiee.dev', 6, '2023-07-16 11:53:34'),
+(9, 2, 7000, 'me@stephiiee.dev', 14, '2023-07-16 11:53:34');
 
 -- --------------------------------------------------------
 
@@ -112,7 +120,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `username`, `email`, `contact`, `password`, `is_admin`) VALUES
 (1, 'admin', 'adm1n.tickectok@gmail.com', '707294699', '$2y$10$2vKxlNfeK7bE8XpDIY7dGe4VhRB4.iVDS7/JTznizStW54iNzb6Lu', 1),
 (5, 'afefefe', 'andrew.karanja@gmail.com', '0712354788', '$2y$10$60qU6md.n8TCm72TreGIS.AzmXUXm6q7JIzfk/6YB5evJo0Mo7TZ6', 0),
-(7, 'stephh', 'me@stephiiee.dev', '071234578', '$2y$10$X7fM93PKqoSq.eEBKyHfXutPTQnSfdeHLibIP8Rd8R67uEOlgyzZe', 0);
+(7, 'stephh', 'me@stephiiee.dev', '071234578', '$2y$10$X7fM93PKqoSq.eEBKyHfXutPTQnSfdeHLibIP8Rd8R67uEOlgyzZe', 0),
+(8, 'andy', 'andy.kimani@gmail.com', '071234578', '$2y$10$ovRI57LqSIWkdbZHbeHyUOnrcMADneyG8A3BZl32mubih5UcRB4f6', 0);
 
 --
 -- Indexes for dumped tables
@@ -129,7 +138,7 @@ ALTER TABLE `events`
 --
 ALTER TABLE `reservations`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `users_id` (`users_id`,`events_id`),
+  ADD KEY `users_id` (`users_email`,`events_id`),
   ADD KEY `events_id` (`events_id`);
 
 --
@@ -155,13 +164,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `reservations`
 --
 ALTER TABLE `reservations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `transactions`
@@ -173,7 +182,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -183,7 +192,7 @@ ALTER TABLE `users`
 -- Constraints for table `reservations`
 --
 ALTER TABLE `reservations`
-  ADD CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `fk_reservations_users` FOREIGN KEY (`users_email`) REFERENCES `users` (`email`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`events_id`) REFERENCES `events` (`id`);
 
 --
