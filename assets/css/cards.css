@@ -19,22 +19,30 @@ html{
 }
 
 .card {
-    flex: 1;/* Distribute available space equally among the cards */
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    word-wrap: break-word;
-    background-color: #fff;
-    background-clip: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: 0.25rem;
-  }
-  
-  .card-img-top {
-    width: 100%;
-    height: auto;
-  }
+  flex: 1;/* Distribute available space equally among the cards */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-top-left-radius: 1.2rem;
+  border-top-right-radius: 1.2rem;
+}
+.mb-11{
+  margin-bottom: 11px;
+}
+.card-img-top {
+  width: 100%;
+  height: auto;
+  border-top-left-radius: 1.2rem;
+  border-top-right-radius: 1.2rem;
+  height: 250px;
+  object-fit: cover;
+}
+
   
   .card-body {
     flex: 1 1 auto;

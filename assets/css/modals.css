@@ -23,7 +23,7 @@
     width: 450px;
     margin: 0 auto;
     background: #fff;
-    padding: 30px 70px 40px;
+    padding: 30px 70px 0px;
     text-align: center;
 }
 
@@ -48,6 +48,10 @@
 
 .form-field{
     margin: 20px 0;
+}
+
+.form-field label{
+    float: left;
 }
 
 .form-field input {
