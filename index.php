@@ -147,8 +147,6 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                 </h3>
                 <br>
                 <button type="button" id="contactUsBtn" class="contact-us">Contact Us </button>
-                <!--  `<?php ?>` tags is used to output the value of given php variable -->
-                <?= $contactUsMsg ?>
             </div>
         </section>
     </div>
@@ -158,8 +156,9 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
     <div class="modal" id="contactus">
         <div class="form-box">
             <h1>Any Inquiries</h1>
+            <small></small>
             <form id="contactForm">
-
+                <input type="hidden" name="formType-contact" value="contact">
                 <div class="form-field">
                     <input type="text" name="email_from" placeholder="Your email">
                     <div class="error"></div>
