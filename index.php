@@ -101,7 +101,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
 
     <!--Signin Modal-->
     <div class="modal" id="signin">
-        <div class="form-box">
+        <div class="form-box" >
             <h1>Login</h1>
             <small></small>
             <form id="signinForm">

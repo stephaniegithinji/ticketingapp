@@ -23,7 +23,7 @@
     width: 450px;
     margin: 0 auto;
     background: #fff;
-    padding: 30px 70px 0px;
+    padding: 30px 70px 35px;
     text-align: center;
 }
 
@@ -155,9 +155,3 @@
 .inline-links-item a.link{
     text-decoration: underline;
 }
-
-
-
-
-
-

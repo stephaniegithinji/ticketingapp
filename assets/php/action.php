@@ -6,6 +6,8 @@ require_once 'client_functions.php';
 // Create a Client instance
 $action = new Client();
 
+$reservations = new Reservations();
+
 // Decode the request body JSON data into an associative array
 $requestBody = json_decode(file_get_contents('php://input'), true);
 
@@ -158,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'signin
     }
 
     echo json_encode($response);
+
     die();
 }
 
@@ -218,33 +221,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $requestBody['formType'] == 'contac
     die();
 }
 
-
-
 if (isset($_POST["purchase-ticket-btn"])) {
     try {
         $eventId = isset($_POST["eventId"]) && !empty($_POST["eventId"]) ? Utils::sanitizeInput($_POST["eventId"]) : Utils::redirect_with_message('../../interfaces/events.php', 'error', 'Event Id cannot be blank!');
-        $userId = $action->fetchUserByEmail($_SESSION['clientEmail']);
-        $no_of_tckts = isset($_POST["number_of_tickets"]) ? (int)$_POST["number_of_tickets"] : 0;
+        $userEmail = $_SESSION['clientEmail'];
+        $userId = $action->fetchUserIdByEmail($userEmail);
+        $no_of_tckts = isset($_POST["number_of_tickets"]) ? Utils::sanitizeInput((int)$_POST["number_of_tickets"]) : 0;
 
-        $price = isset($_POST["ticket_price"]) ? (float)$_POST["ticket_price"] : 0.0;
+        $price = isset($_POST["ticket_price"]) ? Utils::sanitizeInput((float)$_POST["ticket_price"]) : 0.0;
         $total_price = $no_of_tckts * $price;
-        // Utils::redirect_with_message('../../interfaces/events.php', 'success', 'Tiko ni:' .$no_of_tckts . 'na bei ni: ' . $price . 'na total: '.$total_price);
 
+        $eventName = $action->fetchEventNameById($eventId);
 
-        if ($action->createReservation($userId, $eventId, $no_of_tckts, $total_price)) {
-            Utils::redirect_with_message('../../interfaces/events.php', 'success', 'Reservation successfully');
+        // Fetch the event date information based on the event ID
+        $eventDateResult = $action->fetchEventDateById($eventId);
+
+        // Extract individual date components from the result
+        $eventDate = $eventDateResult['date']; // Single event date
+        $fromDate = $eventDateResult['from_date']; // Start date of the date range
+        $toDate = $eventDateResult['to_date']; // End date of the date range
+
+        // Generate the validity dates based on event date or date range
+        $validityDates = ($eventDate !== null)
+            ? date('D, M d, Y', strtotime($eventDate)) // If event date exists, format it as a single date
+            : (($fromDate !== null && $toDate !== null)
+                ? (date('D, M d, Y', strtotime($fromDate)) . ' - ' . date('D, M d, Y', strtotime($toDate))) // If from_date and to_date exist, format them as a date range
+                : 'N/A'); // If both dates are null, set validityDates as 'N/A'
+
+        if ($reservations->confirmReservationAndSendTickets($no_of_tckts, $total_price, $userEmail, $userId, $eventId, $eventName, $validityDates)) {
+            Utils::redirect_with_message('../../interfaces/events.php', 'success', 'Purchase successful. Please check email for your tickets');
         } else {
-            Utils::redirect_with_message('../../interfaces/events.php', 'error', 'Failed to create reservation');
+            Utils::redirect_with_message('../../interfaces/events.php', 'error', 'Purchase Failed');
             return;
         }
-
-        // if ($action->("adm1n.tickectok@gmail.com", $sub, $mailBody)) {
-        //     Utils::redirect_with_message('../../index.php', 'success', 'Message sent! Thanks for contacting us.');
-        //     return;
-        // } else {
-        //     Utils::redirect_with_message('../../index.php', 'error', 'Email not sent. An error was encountered.');
-        //     return;
-        // }
     } catch (Exception $e) {
         // Handle exceptions by returning an error mailBody to user
         Utils::redirect_with_message('../../index.php', 'error', 'Opps...Some error occurred: ' . $e->getMessage());

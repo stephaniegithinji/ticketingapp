@@ -1,62 +1,76 @@
-const contactUsBtn = document.querySelector('[name="contact-btn"]');
-const emailFromEl = document.querySelector('[name="email_from"]');
-const subjectEl = document.querySelector('[name="subject"]');
-const messageEl = document.querySelector('[name="message"]');
+const contactForm = document.getElementById("contactForm");
+const msgContact = document.querySelector('#contactus small');
 
-const isRequiredOnContact = value => Boolean(value);
-
-const showSuccessOnContact = input => {
-  const formField = input.parentElement;
-  formField.classList.remove('error');
-  formField.classList.add('success');
-  const error = formField.querySelector('.error');
-  error.innerText = '';
+const displayMessage = (message, type) => {
+  msgContact.innerHTML = `
+    <div class="alert ${type}">
+        <p class="text">
+            <strong>${message}</strong>
+        </p>
+    </div>`;
 };
 
-const showErrorOnContact = (input, message) => {
-  const formField = input.parentElement;
-  formField.classList.remove('success');
-  formField.classList.add('error');
-  const error = formField.querySelector('.error');
-  error.innerText = message;
-};
+contactForm.addEventListener('submit', async (e) => {
+  e.preventDefault(); // Prevent form submission
 
-const isValidOnContact = (input, pattern, message) => {
-  const value = input.value.trim();
-  if (!isRequiredOnContact(value)) {
-    showErrorOnContact(input, `${input.name} cannot be blank.`);
-    return false;
-  } else if (!pattern.test(value)) {
-    showErrorOnContact(input, message);
-    return false;
-  } else {
-    showSuccessOnContact(input);
-    return true;
-  }
-};
+  const emailFromEl = contactForm['email_from'].value.trim();
+  const subjectEl = contactForm['subject'].value.trim();
+  const messageEl = contactForm['message'].value.trim();
 
-const checkEmailOnContact = () => isValidOnContact(emailFromEl, /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid.');
-const checkSubjectOnContact = () => isValidOnContact(subjectEl, /^[a-zA-Z\s]+$/, 'Subject should only contain letters.');
-const checkMessageOnContact = () => isValidOnContact(messageEl, /^[a-zA-Z\s]+$/, 'Message should only contain letters.');
+  // Clear previous messages
+  msgContact.innerHTML = '';
 
-// Check each input field for errors and
-// prevent form submission if any fields has errors
-contactUsBtn.addEventListener('click', e => {
-  let isFormValidOnContact = true;
-
-  if (!checkEmailOnContact()) {
-    isFormValidOnContact = false;
+  // Input validations
+  if (!emailFromEl) {
+    displayMessage('Email cannot be blank.', 'error');
+    return;
   }
 
-  if (!checkSubjectOnContact()) {
-    isFormValidOnContact = false;
+  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (!emailRegex.test(emailFromEl)) {
+    displayMessage('Email is not valid.', 'error');
+    return;
   }
 
-  if (!checkMessageOnContact()) {
-    isFormValidOnContact = false;
+  if (!subjectEl || !messageEl) {
+    displayMessage('Subject or Message cannot be blank.', 'error');
+    return;
   }
-  if (isFormValidOnContact) { } else {
-    // Prevent form submission
-    e.preventDefault();
+
+  const alphaRegex = /^[a-zA-Z\s]+$/;
+  if (!alphaRegex.test(subjectEl) || !alphaRegex.test(messageEl)) {
+    displayMessage('Subject or Message should only contain letters.', 'error');
+    return;
+  }
+
+  // Preparing request body
+  const requestBody = {
+    formType: 'contact',
+    email: emailFromEl,
+    subject: subjectEl,
+    message: messageEl
+  };
+
+  // Sending POST request
+  try {
+    const response = await fetch('assets/php/action.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (response.ok) {
+      const responseData = await response.json();
+      if (responseData.success) {
+        displayMessage(responseData.message, 'success');
+      } else {
+        displayMessage(responseData.message, 'error');
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    displayMessage('An error occurred during the network call.', 'error');
   }
 });

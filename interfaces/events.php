@@ -57,6 +57,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
     <br><br>
     <?= $message ?>
 
+
     <?php if (!$cards_data) : ?>
         <p class="box">No upcoming Events</p>
     <?php else : ?>
@@ -137,23 +138,25 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
             <h2 id="event-name-buy"></h2>
             <form id="purchaseTicketForm" method="POST" action="../assets/php/action.php">
                 <input type="hidden" name="eventId" value="<?= $card['id'] ?>">
-                <div class="form-field">
-                    <select class="input-field" style="width:100%; height:40px" name="number_of_tickets">
-                        <option disabled>Number Of Tickets (Maximum - 5)</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
+                <?= str_repeat('<br>', 3); ?>
+                <label for="" style="font-size: 15px;">No of tickets to buy</label>
+                <div class="quantity-selector">
+                    <svg class="decrease-quantity" width="18" height="18" viewBox="0 0 448 512">
+                        <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                    </svg>
+
+                    <input readonly name="number_of_tickets" value="1" min="1" max="5" class="input-field quantity" />
+
+                    <svg class="increase-quantity" width="18" height="18">
+                        <g transform="translate(-100 -1482)">
+                            <rect width="24" height="24" transform="translate(100 1482)" fill="rgba(0,0,0,0)"></rect>
+                            <path d="M119,1495h-6v6h-2v-6h-6v-2h6v-6h2v6h6Z"></path>
+                        </g>
+                    </svg>
                 </div>
+                <div class="total-price">Total price: KES. <span id="total-price-display">0</span></div>
+
                 <input type="hidden" name="ticket_price" value="<?= $card['ticket_price'] ?>">
-                <!-- <div class="form-field">
-                    <select class="input-field" style="width:100%; height:40px;" name="mpesa">
-                        <option disabled selected>Payment Method</option>
-                        <option value="MPESA">M-PESA</option>
-                    </select>
-                </div> -->
                 <div class="btn-field">
                     <button type="button" class="close" id="buyingClose">Close</button>
                     <button type="submit" class="btn" name="purchase-ticket-btn">Pay &rarr;</button>
@@ -188,17 +191,6 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
         </div>
     </footer>
     <script src='../assets/js/clientmodals.js'></script>
-    <script>
-        const form = document.getElementById("purchaseTicketForm");
-
-        const selectField = document.querySelector('[name="number_of_tickets"]');
-        form.addEventListener("submit", function(event) {
-            if (selectField.value === null || selectField.value === "") {
-                event.preventDefault(); // Prevent form submission
-                alert("Please select an option for number of tickets.");
-            }
-        });
-    </script>
 </body>
 
 </html>

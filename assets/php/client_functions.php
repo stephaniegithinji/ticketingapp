@@ -2,6 +2,10 @@
 
 require_once __DIR__ .  '/../../connect/config.php';
 
+require_once __DIR__ .  '/../../mailer.php';
+
+
+
 
 
 class Client extends Db
@@ -60,7 +64,7 @@ class Client extends Db
             END AS event_date
             FROM events
             WHERE (date >= CURDATE() OR from_date >= CURDATE())
-            ORDER BY date DESC";
+            ORDER BY date ASC";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute();
 		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -68,14 +72,24 @@ class Client extends Db
 	}
 
 
-	public function fetchUserByEmail(string $email)
+	public function fetchUserIdByEmail(string $email)
 	{
 		$sql = "SELECT id FROM users WHERE email = :email";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(['email' => $email]);
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
-		return $result;
+		return $result['id'];
 	}
+
+	public function fetchEventNameById(string $id)
+	{
+		$sql = "SELECT event_name FROM events WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result['event_name'];
+	}
+
 
 	public function fetchEventDateById(string $id)
 	{
@@ -95,10 +109,14 @@ class Client extends Db
 
 			$currentDate = date('Y-m-d'); // Get the current date
 			$result['hasPassed'] = $result['eventDate'] < $currentDate;
+
+			// Convert the event date to the desired format (e.g., Thu, Jan 01, 2022)
+			$result['eventDate'] = date('D, M d, Y', strtotime($result['eventDate']));
 		}
 
 		return $result;
 	}
+
 
 	public function createReservation($userId, $eventId, $no_tckts, $total)
 	{
@@ -146,8 +164,6 @@ class Client extends Db
 		return $result;
 	}
 
-
-
 	public function getEventNameFromId($id)
 	{
 		$sql = "SELECT event_name FROM events WHERE id = :id";
@@ -155,5 +171,106 @@ class Client extends Db
 		$stmt->execute(['id' => $id]);
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
 		return $result['event_name'];
+	}
+}
+
+
+class Reservations extends Db
+{
+
+	public function makeReservation($numberOfTickets, $totalAmount, $userEmail, $userId, $eventId)
+	{
+		// Insert reservation details into the 'reservations' table
+		$sql = "INSERT INTO `reservations` (`number_of_tickets`, `total_amount`, `users_email`, `events_id`) VALUES (?, ?, ?, ?)";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute([$numberOfTickets, $totalAmount, $userEmail, $eventId]);
+
+		// Get the last inserted ID, which is the reservation ID
+		$reservationId = $this->conn->lastInsertId();
+
+		// Decrement the tickets_capacity column in the events table
+		$updateSql = "UPDATE `events` SET `tickets_capacity` = `tickets_capacity` - ? WHERE `id` = ?";
+		$updateStmt = $this->conn->prepare($updateSql);
+		$updateStmt->execute([$numberOfTickets, $eventId]);
+
+		// Create a unique transaction for each reservation
+		$this->createTransaction($userId);
+
+		// Generate unique tickets for the reservation
+		return $this->generateTickets($reservationId, $numberOfTickets);
+	}
+
+
+	protected function createTransaction($userId)
+	{
+		// Generate a unique transaction code
+		$transactionCode = $this->generateToken();
+
+		// Insert the user ID and transaction code into the 'transactions' table
+		$sql = "INSERT INTO `transactions` (`users_id`, `transaction_code`) VALUES (?, ?)";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute([$userId, $transactionCode]);
+
+		return $transactionCode;
+	}
+
+	protected function generateTickets($reservationId, $numberOfTickets)
+	{
+		// Save tcks into an array since tickets could one or more
+		$tickets = [];
+		for ($i = 0; $i < $numberOfTickets; $i++) {
+			// Generate a unique token for each ticket
+			$token = $this->generateToken();
+
+			// Insert the reservation ID and token into the 'tickets' table
+			$sql = "INSERT INTO `tickets` (`reservation_id`, `token`) VALUES (?, ?)";
+			$stmt = $this->conn->prepare($sql);
+			$stmt->execute([$reservationId, $token]);
+
+			// Add the token to the tickets array
+			$tickets[] = $token;
+		}
+
+		return $tickets;
+	}
+
+	// Generate a unique token
+	protected function generateToken()
+	{
+		return bin2hex(random_bytes(16));
+	}
+
+	public function getEventVenueFromId($id)
+	{
+		$sql = "SELECT venue FROM events WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result['venue'];
+	}
+
+	public function getEventTimeFromId($id)
+	{
+		$sql = "SELECT time FROM events WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result['id'];
+	}
+
+	public function confirmReservationAndSendTickets($numberOfTickets, $totalAmount, $userEmail, $userId, $eventId, $eventName, $validityDates)
+	{
+		// Make reservations and get the tickets
+		$tickets = $this->makeReservation($numberOfTickets, $totalAmount, $userEmail, $userId, $eventId);
+
+		$eventLocation = $this->getEventVenueFromId($eventId);
+		$eventTime = $this->getEventTimeFromId($eventId);
+		// Invoke Mailer class to statically access
+		// sendTicketsByEmail function now which  send the tickets
+		if (Mailer::sendTicketsByEmail($userEmail, $tickets, $eventName, $validityDates, $eventLocation, $eventTime)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

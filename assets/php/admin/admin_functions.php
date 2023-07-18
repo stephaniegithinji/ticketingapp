@@ -3,6 +3,7 @@
 require_once __DIR__ .  '/../../../connect/config.php';
 
 
+
 class Admin extends Db
 {
 
@@ -23,14 +24,14 @@ class Admin extends Db
 	public function addEvent($event_name, $date, $venue, $time, $ticket_price, $tickets_capacity, $thumbnail, $from_date, $to_date)
 	{
 		$sql = "INSERT INTO events (event_name, date, venue, time, ticket_price, tickets_capacity, banner, created_at, updated_at, from_date, to_date) 
-            VALUES (:event_name, :date, :venue, :time, :ticket_price, :tickets_capacity, :banner, NOW(), '0000-00-00 00:00:00', :from_date, :to_date)";
+				VALUES (:event_name, :date, :venue, :time, :ticket_price, :tickets_capacity, :banner, NOW(), '0000-00-00 00:00:00', :from_date, :to_date)";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute([
 			'event_name' => $event_name,
 			'date' => $date,
 			'venue' => $venue,
 			'time' => $time,
-			'ticket_price' => $ticket_price,
+			'ticket_price' => (int)$ticket_price,
 			'tickets_capacity' => $tickets_capacity,
 			'banner' => $thumbnail,
 			'from_date' => $from_date,
@@ -38,6 +39,8 @@ class Admin extends Db
 		]);
 		return true;
 	}
+
+
 
 	/**
 	 * Fetch all events from the events table.
@@ -99,9 +102,22 @@ class Admin extends Db
 	 */
 	public function deleteEvent($id)
 	{
+		// Check if there are any reservations for the event
+		$sql = "SELECT COUNT(*) FROM reservations WHERE events_id = :event_id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['event_id' => $id]);
+		$reservationCount = $stmt->fetchColumn();
+
+		if ($reservationCount > 0) {
+			// There are reservations for the event, return false
+			return false;
+		}
+
+		// No reservations exist, perform the deletion
 		$sql = "DELETE FROM events WHERE id = :id";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(['id' => $id]);
+
 		return true;
 	}
 }
