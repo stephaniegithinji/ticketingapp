@@ -14,6 +14,8 @@ $interfaces = new Admin();
 
 $cards_data = $interfaces->fetchEvents();
 
+$checkReservationsForAnEvent = $interfaces->fetchEvents();
+
 // coalescing operator `??`
 // checks if a variable exists and is not null,
 // and if it doesn't, it returns a default value
@@ -48,10 +50,8 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
             <h1 class="logo" style="font-size: 40px;">TickeTok </h1>
             <ul style="font-size: 15px;">
                 <li><a href="#">Hi, <?= $admin ?></li>
-
                 <li><a href="#" id="addBtn">Create Event</a></li>
                 <li><a href="../assets/php/admin/logout.php">Logout</a></li>
-                <li><input type="text" id="search" name="search" placeholder="SEARCH"></li>
             </ul>
         </div>
     </div>
@@ -63,12 +63,29 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
             <p class="box">No Events at the moments!</p>
         </div>
     <?php else : ?>
+        <!-- Start of Filter & Search Container -->
+        <div class="filter-search-container">
+            <div class="filter-container">
+                <label for="event-filter">Sorted By:</label>
+                <select name="event-filter">
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Conferencing">Conferencing</option>
+                    <option value="Movies &amp; Theatre">Movies &amp; Theatre</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Free events">Free events</option>
+                </select>
+            </div>
+            <div class="search-container">
+                <label>Search:</label> <input type="text" id="searchInput" class="search-input">
+            </div>
+        </div>
+        <!-- End of Filter & Search Container -->
         <?= str_repeat('<br>', 4); ?>
         <p class="box">Events Line up</p>
         <!-- this row is the container with the card-->
         <div class="card-container" style="margin-left: 130px; margin-bottom: 100px">
             <?php $rowCount = 0; ?>
-            <table class="cards-table">
+            <table id="cardsContainer" class="cards-table">
                 <?php foreach ($cards_data as $card) : ?>
                     <?php if ($rowCount % 3 === 0) : ?>
                         <tr>
@@ -122,7 +139,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512">
                                                     <path d="M64 64C28.7 64 0 92.7 0 128v64c0 8.8 7.4 15.7 15.7 18.6C34.5 217.1 48 235 48 256s-13.5 38.9-32.3 45.4C7.4 304.3 0 311.2 0 320v64c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V320c0-8.8-7.4-15.7-15.7-18.6C541.5 294.9 528 277 528 256s13.5-38.9 32.3-45.4c8.3-2.9 15.7-9.8 15.7-18.6V128c0-35.3-28.7-64-64-64H64zm64 112l0 160c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16V176c0-8.8-7.2-16-16-16H144c-8.8 0-16 7.2-16 16zM96 160c0-17.7 14.3-32 32-32H448c17.7 0 32 14.3 32 32V352c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32V160z" />
                                                 </svg>
-                                                <span class="tck">Capacity: <?= $card['tickets_capacity'] ?></span>
+                                                Capacity: <?= $card['tickets_capacity'] ?>
                                             </li>
                                         </ul>
                                         <br><br>
@@ -130,7 +147,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                                         <br><br>
                                         <button id="deleteBtn" class="btn btn-danger">Delete</button>
                                         <br><br>
-                                        <button class="btn btn-success">View Report</button>
+                                        <a href="reports.php?evid=<?= $card['id'] ?>" class="btn btn-success">View Report</a>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +161,6 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
 
                 <?php endforeach; ?>
             </table>
-
         </div>
     <?php endif; ?>
 
@@ -254,7 +270,8 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
                 </div>
                 <div class="form-field">
                     <label>Tickets capacity:</label>
-                    <input type="number" name="ticket_capacity" placeholder="Tickets Available" value="<?= $card['tickets_capacity'] ?>">
+                    <input readonly type="number" name="ticket_capacity" placeholder="Tickets Available" value="<?= $card['tickets_capacity'] ?>">
+
                 </div>
                 <div class="btn-field">
                     <button type="button" class="close" id="editClose">Close</button>
@@ -308,28 +325,47 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
         </div>
     </footer>
     <script>
-        // JavaScript to toggle the visibility of the date fields based on the event type selection
-        document.addEventListener('DOMContentLoaded', function() {
-            const eventSelect = document.getElementById('event_duration');
-            const formBox = document.querySelector('.form-box');
-            const dateField = document.getElementById('date_field');
-            const fromDateField = document.getElementById('from_date_field');
-            const toDateField = document.getElementById('to_date_field');
+        /**
+         * Initializes live search functionality.
+         * Binds an event listener to the search input 
+         * and filters the table rows based on the entered search query.
+         */
+        function initializeLiveSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const cardsContainer = document.getElementById('cardsContainer');
+            const tableRows = cardsContainer.getElementsByTagName('tr');
 
-            eventSelect.addEventListener('change', function() {
-                if (eventSelect.value === 'date_range') {
-                    formBox.style.height = '980px';
-                    dateField.style.display = 'none';
-                    fromDateField.style.display = 'block';
-                    toDateField.style.display = 'block';
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value.trim().toLowerCase();
+
+                for (let i = 0; i < tableRows.length; i++) {
+                    const cardTitle = tableRows[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
+
+                    if (query === '' || cardTitle.includes(query)) {
+                        tableRows[i].style.display = '';
+                    } else {
+                        tableRows[i].style.display = 'none';
+                    }
+                }
+
+                // Show all cards if the search query is empty
+                if (query === '') {
+                    for (let i = 0; i < tableRows.length; i++) {
+                        tableRows[i].style.display = '';
+                    }
+                }
+
+                // Show a message when no matches are found
+                const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+                if (visibleRows.length === 0) {
+                    cardsContainer.innerHTML = '<p class="box">No matching events found.</p>';
                 } else {
-                    formBox.style.height = '870px';
-                    dateField.style.display = 'block';
-                    fromDateField.style.display = 'none';
-                    toDateField.style.display = 'none';
+                    cardsContainer.innerHTML = ''; // Clear the message if matches are found
                 }
             });
-        });
+        }
+
+        initializeLiveSearch();
     </script>
     <script src="../assets/js/adminmodals.js"></script>
 </body>

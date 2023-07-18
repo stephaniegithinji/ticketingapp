@@ -71,8 +71,6 @@ class Admin extends Db
 		return $result;
 	}
 
-
-
 	/**
 	 * Edit an existing event in the events table.
 	 *
@@ -119,5 +117,29 @@ class Admin extends Db
 		$stmt->execute(['id' => $id]);
 
 		return true;
+	}
+
+
+
+	public function generateUserReservationReport($eventID)
+	{
+		// Fetch the data from the database for the specific event
+		$sql = "SELECT r.id AS reservation_id, r.users_email, r.events_id, e.event_name, r.number_of_tickets, r.total_amount
+            FROM reservations r
+            INNER JOIN events e ON r.events_id = e.id
+            WHERE r.events_id = :eventID";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['eventID' => $eventID]);
+		$reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		return $reservations;
+	}
+
+	public function fetchEventNameById(string $id)
+	{
+		$sql = "SELECT event_name FROM events WHERE id = :id";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result['event_name'];
 	}
 }

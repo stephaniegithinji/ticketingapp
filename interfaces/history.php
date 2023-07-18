@@ -1,7 +1,5 @@
 <?php
 
-
-
 require_once '../utils.php';
 
 require_once  '../assets/php/client_functions.php';
@@ -59,7 +57,7 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
   <br><br>
   <div>
 
-  </div>
+
   <br><br>
   <?php if (!$reservation_data) : ?>
     <p class="box1">No history data at the moment!</p>

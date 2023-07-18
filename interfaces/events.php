@@ -49,7 +49,6 @@ unset($_SESSION['success'], $_SESSION['error'], $_SESSION['contactUsMessage']);
             <li><a href="#">Hi, <?= $currentlyLoggedInUser ?></li>
             <li><a href="history.php">My History</a></li>
             <li><a href="../assets/php/logout.php">Logout</a></li>
-            <li><input type="text" id="search" name="search" placeholder="SEARCH"></li>
         </ul>
     </div>
 
